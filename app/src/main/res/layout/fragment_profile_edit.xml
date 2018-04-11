@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/edit_profile_name_label"
+        android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+        android:labelFor="@+id/edit_profile_name_edit"/>
+
+    <EditText
+        android:id="@+id/edit_profile_name_edit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/edit_profile_name_placeholder" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/edit_profile_make_label"
+        android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+        android:labelFor="@+id/edit_profile_make_spinner"/>
+
+    <Spinner
+        android:id="@+id/edit_profile_make_spinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/edit_profile_model_label"
+        android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+        android:labelFor="@+id/edit_profile_model_spinner"/>
+
+    <Spinner
+        android:id="@+id/edit_profile_model_spinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/edit_profile_reg_label"
+        android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+        android:labelFor="@+id/edit_profile_reg_edit"/>
+
+    <EditText
+        android:id="@+id/edit_profile_reg_edit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/edit_profile_reg_placeholder"/>
+
+    <CheckBox
+        android:id="@+id/edit_profile_active_check"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/edit_profile_active_checkbox_text"/>
+
+</LinearLayout>

@@ -1,0 +1,60 @@
+<resources>
+    <string name="app_name">Elandroid</string>
+
+    <!-- Database values -->
+        <string name="database_table_name">elandroid</string>
+
+    <!-- -->
+    <string name="shared_prefs_profile">user_profile</string>
+    <string name="saved_active_profile_id">saved_active_profile_id</string>
+
+    <!-- Navigation activity -->
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="navigation_drawer_dashboard">Dashboard</string>
+    <string name="navigation_drawer_trip_log">Trip Log</string>
+    <string name="navigation_drawer_statistics">Statistics</string>
+    <string name="navigation_drawer_settings">Settings</string>
+
+    <!-- Service activity -->
+    <string name="action_connect">Connect</string>
+
+    <!-- Dashboard activity -->
+    <string name="action_create_page_positive">Create</string>
+    <string name="action_create_page_negative">Cancel</string>
+
+    <string name="dashboard_title">Dashboard</string>
+
+
+
+    <!-- Profile activity -->
+    <string name="action_add_profile">Add profile</string>
+    <string name="action_save_profile">Save</string>
+    <string name="action_delete_profile">Delete</string>
+    <string name="action_create_profile">Create profile</string>
+
+
+    <string name="edit_profile_toast_updated_profile_success">Your profile has been updated</string>
+    <string name="edit_profile_toast_updated_profile_fail">Your profile was unabled to be updated</string>
+    <string name="edit_profile_error_profile_missing">Unable to retrieve the profile</string>
+    <string name="edit_profile_error_name_missing">You need a profile name to proceed</string>
+
+    <string name="manage_profiles_title">Manage profiles</string>
+    <string name="new_profile_title">Create profile</string>
+    <string name="edit_profile_title_preamble">Edit profile -</string>
+
+    <string name="edit_profile_name_label">Profile name</string>
+    <string name="edit_profile_name_placeholder"></string>
+    <string name="edit_profile_make_label">Vehicle make</string>
+    <string name="edit_profile_model_label">Vehicle model</string>
+    <string name="edit_profile_reg_label">Number plate</string>
+    <string name="edit_profile_reg_placeholder">E14 N01</string>
+    <string name="edit_profile_active_checkbox_text">Active profile</string>
+
+
+
+    <!-- Action bar menu -->
+    <string name="action_settings">Settings</string>
+
+
+</resources>

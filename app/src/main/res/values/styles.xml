@@ -1,0 +1,74 @@
+<resources>
+
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/orangeRed</item>
+        <item name="colorControlNormal">@color/onyx</item>
+        <item name="android:colorBackground">@color/lightGray</item>
+        <item name="android:colorForeground">@color/blueGreen</item>
+
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <style name="AppTheme.ProfileSpinner.SpinnerItem" parent="android:Widget.TextView.SpinnerItem">
+        <item name="android:textColor">#FFFFFF</item>
+    </style>
+
+    <style name="AppTheme.ProfileSpinner.DropDownItem" parent="android:Widget.DropDownItem.Spinner">
+        <item name="android:textColor">#FFFFFF</item>
+    </style>
+
+<!--
+
+
+    <style name="SpinnerTheme.DropDown">
+        <item name="android:spinnerMode">dropdown</item>
+    </style>
+
+
+    <style name="SpinnerTheme.DropDownItem" parent="android:Widget.DropDownItem.Spinner">
+
+    </style>
+
+    <style name="SpinnerTheme.ListView" parent="android:Widget.ListView">
+
+    </style>
+
+    <style name="SpinnerTheme.ListView.White" parent="android:Widget.ListView.White">
+
+    </style>
+
+    <style name="SpinnerTheme.SpinnerItem" parent="TextAppearance.AppCompat.Widget.TextView.SpinnerItem">
+        <item name="android:textColor">#FFFFFF</item>
+    </style>
+
+
+    <style name="SpinnerItem" parent="android:Widget.TextView.SpinnerItem">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:typeface">normal</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:lineSpacingExtra">0sp</item>
+        <item name="android:textColor">@android:color/white</item>
+    </style>
+
+    <style name="AppTheme.Widget.DropDownItem.Spinner" parent="android:Widget.DropDownItem.Spinner">
+        <item name="android:textAppearance">@style/TextAppearance.AppCompat.Widget.DropDownItem</item>
+    </style>
+
+    <style name="AppTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+-->
+</resources>
