@@ -26,7 +26,7 @@ public class ProfileAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     }
 
     private List<Profile> mProfiles;
-    private OnProfileSelectedListener mSelectedListener;
+    private OnProfileSelectedListener mListener;
 
     public ProfileAdapter () {
         this (null, null);
@@ -38,7 +38,7 @@ public class ProfileAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     public ProfileAdapter (List<Profile> profiles, OnProfileSelectedListener listener) {
         this.mProfiles = (profiles == null) ? new ArrayList<Profile>() : profiles;
-        this.mSelectedListener = listener;
+        this.mListener = listener;
     }
 
     public void update (List<Profile> profiles) {
@@ -69,7 +69,7 @@ public class ProfileAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        ((ProfileViewHolder) holder).bind(mProfiles.get(position), mSelectedListener);
+        ((ProfileViewHolder) holder).bind(mProfiles.get(position), mListener);
     }
 
     private static class ProfileViewHolder extends RecyclerView.ViewHolder {

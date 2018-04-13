@@ -25,6 +25,18 @@
         <item name="android:textColor">#FFFFFF</item>
     </style>
 
+    <style name="AppTheme.ListItem">
+
+    </style>
+
+    <style name="AppTheme.ListItem.Medium">
+        <item name="android:listPreferredItemHeight">@dimen/list_item_medium_height</item>
+    </style>
+
+    <style name="AppTheme.ListItem.Medium.Primary">
+        <item name="android:textSize">@dimen/list_item_medium_text_size_primary</item>
+    </style>
+
 <!--
 
 

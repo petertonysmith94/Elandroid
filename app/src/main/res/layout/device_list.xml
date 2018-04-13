@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+        <import type="android.view.View"/>
+        <variable
+            name="data"
+            type="com.elan_droid.elandroid.ui.bluetooth.Devices"/>
+    </data>
+
+    <FrameLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="There are no devices here"
+            android:visibility="@{data.getSize() > 0 ? View.GONE : View.VISIBLE}"/>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/device_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="@{data.getSize() > 0 ? View.VISIBLE : View.GONE}"/>
+
+    </FrameLayout>
+</layout>

@@ -52,14 +52,14 @@ public abstract class BaseActivity extends AppCompatActivity implements UpdateDi
 
     @Override
     public void displayDialog(final DialogFragment fragment) {
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         Fragment previous = getSupportFragmentManager().findFragmentByTag(DIALOG_FRAGMENT_TAG);
 
         if (previous != null) {
-            transaction.remove(previous);
+            getSupportFragmentManager().beginTransaction()
+                    .remove(previous).commit();
         }
 
-        fragment.show(transaction, DIALOG_FRAGMENT_TAG);
+        fragment.show(this.getSupportFragmentManager(), DIALOG_FRAGMENT_TAG);
     }
 
 }

@@ -89,7 +89,7 @@ public class VehicleModel extends AndroidViewModel {
 
         /**
          * Provides the task with the given parameters needed.
-         * @param database  the database instance
+         * @param database  the database getInstance
          * @param adapter   the model adapter to populate
          */
         protected FetchModelAsyncTask (AppDatabase database, ArrayAdapter<String> adapter) {

@@ -7,15 +7,9 @@
     android:padding="16dp"
     android:weightSum="1">
 
-    <TextView
+    <FrameLayout
+        android:id="@+id/dialog_dashboard_content"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Page name"
-        android:labelFor="@+id/dialog_dashboard_add_page_name"/>
-
-    <EditText
-        android:id="@+id/dialog_dashboard_add_page_name"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="match_parent" />
 
 </LinearLayout>

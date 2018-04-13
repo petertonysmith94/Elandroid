@@ -27,18 +27,14 @@ public class ProfileSelectDialog extends DialogFragment implements DialogInterfa
     private Button mActionButton;
 
 
-    public static DialogFragment instance() {
+    public static DialogFragment getInstance() {
         DialogFragment dialog = new ProfileSelectDialog();
         return dialog;
     }
 
-
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-
     }
 
     @NonNull

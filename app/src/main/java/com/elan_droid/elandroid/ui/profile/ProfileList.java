@@ -18,6 +18,7 @@ import com.elan_droid.elandroid.adapter.ProfileAdapter;
 import com.elan_droid.elandroid.database.relation.Profile;
 import com.elan_droid.elandroid.database.view.ActiveProfile;
 import com.elan_droid.elandroid.database.view.ProfileModel;
+import com.elan_droid.elandroid.ui.generic.BaseFragment;
 
 import java.util.List;
 
@@ -25,7 +26,7 @@ import java.util.List;
  * Created by Peter Smith
  */
 
-public class ProfileList extends Fragment {
+public class ProfileList extends BaseFragment {
 
     public static final String TAG = "ProfileList";
 
@@ -42,8 +43,8 @@ public class ProfileList extends Fragment {
 
     private ProfileAdapter.OnProfileSelectedListener mListener;
 
-    public static Fragment getInstance() {
-        Fragment fragment = new ProfileList();
+    public static BaseFragment getInstance() {
+        BaseFragment fragment = new ProfileList();
         return fragment;
     }
 

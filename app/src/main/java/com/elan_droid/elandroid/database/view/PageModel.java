@@ -92,7 +92,7 @@ public class PageModel extends AndroidViewModel {
         @Override
         protected List<Page> doInBackground(Long... params) {
             List<Page> pages = null;
-            if(params.length > 0 && params[0] != 0) {
+            if (params.length > 0 && params[0] != 0) {
                 pages = mmDatabase.pageDao().getPages(params[0]);
             }
             return pages;
@@ -106,4 +106,7 @@ public class PageModel extends AndroidViewModel {
         }
 
     }
+
+
+
 }

@@ -8,6 +8,9 @@
     <string name="shared_prefs_profile">user_profile</string>
     <string name="saved_active_profile_id">saved_active_profile_id</string>
 
+    <!-- List Item nothing -->
+    <string name="list_item_nothing_default">Nothing present</string>
+
     <!-- Navigation activity -->
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -17,9 +20,15 @@
     <string name="navigation_drawer_settings">Settings</string>
 
     <!-- Service activity -->
+    <string name="toast_cannot_profile_change">You can\'t change profiles while logging!</string>
+
     <string name="action_connect">Connect</string>
+    <string name="action_disconnect">Disconnect</string>
+    <string name="action_start_logging">Start logging</string>
+    <string name="action_stop_logging">Stop logging</string>
 
     <!-- Dashboard activity -->
+    <string name="action_menu_widget_add">Add display</string>
     <string name="action_create_page_positive">Create</string>
     <string name="action_create_page_negative">Cancel</string>
 

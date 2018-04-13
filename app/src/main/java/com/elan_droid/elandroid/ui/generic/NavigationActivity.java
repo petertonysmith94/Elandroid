@@ -319,7 +319,7 @@ public abstract class NavigationActivity extends BaseActivity implements
         switch (view.getId()) {
             case R.id.nav_header_container:
                 // Launches the profile selection dialogs
-                DialogFragment fragment = ProfileSelectDialog.instance();
+                DialogFragment fragment = ProfileSelectDialog.getInstance();
                 displayDialog(fragment);
                 break;
 

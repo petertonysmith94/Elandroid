@@ -15,9 +15,8 @@ import static android.arch.persistence.room.ForeignKey.CASCADE;
  * Created by Peter Smith
  */
 @Entity (
-tableName = Page.TABLE_NAME,
-foreignKeys =
-    @ForeignKey(
+    tableName = Page.TABLE_NAME,
+    foreignKeys = @ForeignKey (
         entity = User.class,
         parentColumns = User.COLUMN_ID,
         childColumns = User.REFERENCE_COLUMN_ID,

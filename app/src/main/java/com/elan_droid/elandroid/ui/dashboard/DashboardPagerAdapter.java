@@ -6,7 +6,8 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
 import com.elan_droid.elandroid.database.entity.Page;
-import com.elan_droid.elandroid.ui.dashboard.DashboardPageFragment;
+import com.elan_droid.elandroid.database.relation.PageContent;
+import com.elan_droid.elandroid.database.view.PageModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +41,10 @@ public class DashboardPagerAdapter extends FragmentStatePagerAdapter  {
         notifyDataSetChanged();
     }
 
+    public Page getPage (int position) {
+        return mPages.get(position);
+    }
+
     @Override
     public int getCount() {
         return mPages.size();
@@ -48,15 +53,7 @@ public class DashboardPagerAdapter extends FragmentStatePagerAdapter  {
     @Override
     public Fragment getItem(int position) {
         final Page page = mPages.get(position);
-        Fragment fragment = null;
-
-        if (page != null) {
-            fragment = DashboardPageFragment.getInstance(page);
-        }
-        else {
-            //fragment = DashboardPageFragment.getInstance(new Page("Add", 10));
-        }
-        return fragment;
+        return BaseDashboardPage.getInstance(page);
     }
 
     @Override

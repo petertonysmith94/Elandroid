@@ -9,6 +9,15 @@
 
     <dimen name="dialog_padding">16dp</dimen>
 
+    <dimen name="list_item_small_text_size_primary">16dp</dimen>
+    <dimen name="list_item_small_height">32dp</dimen>
+
+    <dimen name="list_item_medium_text_size_primary">32dp</dimen>
+    <dimen name="list_item_medium_height">64dp</dimen>
+
+
+    <dimen name="list_item_large_height">128dp</dimen>
+
     <dimen name="list_item_padding">16dp</dimen>
     <dimen name="list_item_margin_top">8dp</dimen>
     

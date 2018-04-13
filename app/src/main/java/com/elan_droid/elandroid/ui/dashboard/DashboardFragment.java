@@ -32,17 +32,19 @@ import static com.elan_droid.elandroid.ui.generic.BaseActivity.NEW_PAGE_REQUEST_
 
 /**
  * Created by Peter Smith
+ *
+ * @Purpose
+ *
  */
-
 public class DashboardFragment extends BaseFragment implements View.OnClickListener {
 
     public static final String TAG = "DashboardFragment";
 
-
+    //
     private PageModel mPageModel;
 
 
-    private DashboardPagerAdapter mAdapter;
+    private DashboardPagerAdapter mPageAdapter;
 
 
     private ViewPager mPager;
@@ -69,7 +71,7 @@ public class DashboardFragment extends BaseFragment implements View.OnClickListe
         Log.d(TAG, "onCreate(savedInstanceState) called");
         setHasOptionsMenu(true);
 
-        mAdapter = new DashboardPagerAdapter(getActivity().getSupportFragmentManager());
+        mPageAdapter = new DashboardPagerAdapter(getActivity().getSupportFragmentManager());
 
         mPageModel = ViewModelProviders.of(getActivity()).get(PageModel.class);
 
@@ -91,7 +93,7 @@ public class DashboardFragment extends BaseFragment implements View.OnClickListe
             @Override
             public void onFetch(List<Page> pages) {
                 if (pages != null) {
-                    mAdapter.updatePages(pages);
+                    mPageAdapter.updatePages(pages);
                 }
             }
         });
@@ -100,13 +102,13 @@ public class DashboardFragment extends BaseFragment implements View.OnClickListe
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
         Log.d(TAG, "onPrepareOptionsMenu(menu) called");
-
         super.onPrepareOptionsMenu(menu);
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         Log.d(TAG, "onCreateOptionsMenu(menu, inflater) called");
+        inflater.inflate(R.menu.dashboard, menu);
 
         super.onCreateOptionsMenu(menu, inflater);
     }
@@ -114,8 +116,9 @@ public class DashboardFragment extends BaseFragment implements View.OnClickListe
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.menu_connect:
-
+            case R.id.menu_widget_add:
+                Page page = mPageAdapter.getPage (mPager.getCurrentItem());
+                displayDialog(WidgetDialog.getInstance(page));
                 return true;
 
             default:
@@ -132,7 +135,7 @@ public class DashboardFragment extends BaseFragment implements View.OnClickListe
         getActivity().setTitle("Dashboard");
 
         mPager = (ViewPager) view.findViewById(R.id.dashboard_view_pager);
-        mPager.setAdapter(mAdapter);
+        mPager.setAdapter(mPageAdapter);
 
         tabLayout = (TabLayout) view.findViewById(R.id.area_tabs);
         tabLayout.setupWithViewPager(mPager, true);
@@ -164,7 +167,7 @@ public class DashboardFragment extends BaseFragment implements View.OnClickListe
                     mPageModel.newPage(getActiveProfileId(), name, new PageModel.NewPageCallback() {
                         @Override
                         public void onPageCreated(Page page) {
-                            mAdapter.addPage(page);
+                            mPageAdapter.addPage(page);
                         }
                     });
                 }

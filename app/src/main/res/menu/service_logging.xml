@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <group android:id="@+id/service_logging">
+
+        <item
+            android:id="@+id/menu_logging_stop"
+            android:orderInCategory="1"
+            android:icon="@drawable/ic_stop_white_24dp"
+            android:title="@string/action_stop_logging"
+            app:showAsAction="always|withText" />
+
+        <item
+            android:id="@+id/menu_logging_disconnect"
+            android:orderInCategory="2"
+            android:icon="@drawable/ic_bluetooth_disconnect_white_24dp"
+            android:title="@string/action_disconnect"
+            app:showAsAction="ifRoom" />
+
+    </group>
+
+</menu>

@@ -15,7 +15,7 @@ import com.elan_droid.elandroid.database.entity.Page;
  * Created by Peter Smith
  */
 
-public class DashboardPageFragment extends Fragment {
+    public class BaseDashboardPage extends Fragment {
 
     private static final String EXTRA_PAGE = "com.elan_droid.elandroid.ui.dashboard.EXTRA_PAGE";
 
@@ -26,7 +26,7 @@ public class DashboardPageFragment extends Fragment {
         Bundle params = new Bundle();
         params.putParcelable(EXTRA_PAGE, page);
 
-        Fragment fragment = new DashboardPageFragment();
+        Fragment fragment = new BaseDashboardPage();
         return fragment;
     }
 
