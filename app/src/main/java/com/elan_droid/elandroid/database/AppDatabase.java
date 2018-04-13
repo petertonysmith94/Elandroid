@@ -9,11 +9,13 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 
 import com.elan_droid.elandroid.database.dao.PageDao;
+import com.elan_droid.elandroid.database.dao.PageItemDao;
 import com.elan_droid.elandroid.database.dao.ProfileDao;
 import com.elan_droid.elandroid.database.dao.TripDao;
 import com.elan_droid.elandroid.database.dao.UserDao;
 import com.elan_droid.elandroid.database.dao.VehicleDao;
 import com.elan_droid.elandroid.database.entity.Page;
+import com.elan_droid.elandroid.database.entity.PageItem;
 import com.elan_droid.elandroid.database.entity.Trip;
 import com.elan_droid.elandroid.database.entity.User;
 import com.elan_droid.elandroid.database.entity.Vehicle;
@@ -28,7 +30,8 @@ import java.util.concurrent.Executors;
     version = 1,
     exportSchema = false,
     entities = {
-        Vehicle.class, User.class, Page.class, Trip.class
+        Vehicle.class, User.class, Page.class, PageItem.class,
+            Trip.class
     }
 )
 public abstract class AppDatabase extends RoomDatabase {
@@ -73,6 +76,8 @@ public abstract class AppDatabase extends RoomDatabase {
     public abstract ProfileDao profileDao();
 
     public abstract PageDao pageDao();
+
+    public abstract PageItemDao pageItemDao();
 
     public abstract TripDao tripDao();
 

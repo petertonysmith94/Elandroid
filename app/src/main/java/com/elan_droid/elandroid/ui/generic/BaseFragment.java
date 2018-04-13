@@ -30,9 +30,6 @@ public abstract class BaseFragment extends Fragment implements UpdateDialogListe
 
     private ActiveProfile mProfileModel;
 
-    private Profile mProfile;
-
-
     public static Bundle createArguments(long userId) {
         Bundle args  = new Bundle();
         args.putLong(EXTRA_PROFILE_ID, userId);
@@ -44,11 +41,11 @@ public abstract class BaseFragment extends Fragment implements UpdateDialogListe
     }
 
     public Profile getActiveProfile() {
-        return mProfile;
+        return mProfileModel.getActiveProfile().getValue();
     }
 
     public long getActiveProfileId() {
-        return mProfile == null ? 0 : mProfile.getProfileId();
+        return getActiveProfile() == null ? 0 : getActiveProfile().getProfileId();
     }
 
     @Override
@@ -57,13 +54,6 @@ public abstract class BaseFragment extends Fragment implements UpdateDialogListe
         Log.d(TAG, "onCreate(savedInstanceState) called");
 
         mProfileModel = ViewModelProviders.of(getActivity()).get(ActiveProfile.class);
-        mProfileModel.getActiveProfile().observe(this, new Observer<Profile>() {
-            @Override
-            public void onChanged(@Nullable Profile profile) {
-                mProfile = profile;
-            }
-        });
-
     }
 
     @Override

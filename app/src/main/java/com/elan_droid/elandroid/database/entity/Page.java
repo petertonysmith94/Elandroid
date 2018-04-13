@@ -26,6 +26,7 @@ import static android.arch.persistence.room.ForeignKey.CASCADE;
 )
 public class Page implements Parcelable
 {
+    public final static String EXTRA = "com.elan_droid.elandroid.database.entity.EXTRA_PAGE";
 
     public final static String TABLE_NAME = "page";
     public final static String REFERENCE_COLUMN_ID = "page_id";
@@ -94,17 +95,21 @@ public class Page implements Parcelable
     }
 
     /**
-     *
+     * Constructing the page from a parcel
      * @param in
      */
     @Ignore
     private Page(Parcel in) {
+        id = in.readLong();
+        userId = in.readLong();
         title = in.readString();
         order = in.readInt();
     }
 
     @Override
     public void writeToParcel(Parcel out, int flags) {
+        out.writeLong(id);
+        out.writeLong(userId);
         out.writeString(title);
         out.writeInt(order);
     }

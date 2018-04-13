@@ -110,11 +110,15 @@ public abstract class NavigationActivity extends BaseActivity implements
         mActiveProfile.getActiveProfile().observe(this, new Observer<Profile>() {
             @Override
             public void onChanged(@Nullable Profile profile) {
-                mNameText.setText(profile.getName());
-                mMakeModel.setText(profile.getMakeModel());
-                mRegistration.setText(profile.getRegistration());
-
-                transitionFragmentWithFallback(false);
+                if (profile != null) {
+                    mNameText.setText(profile.getName());
+                    mMakeModel.setText(profile.getMakeModel());
+                    mRegistration.setText(profile.getRegistration());
+                    transitionFragmentWithFallback(false);
+                }
+                else {
+                    forceNewProfile();
+                }
             }
         });
 

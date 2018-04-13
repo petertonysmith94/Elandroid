@@ -16,6 +16,7 @@ import android.support.annotation.Nullable;
 import com.elan_droid.elandroid.R;
 import com.elan_droid.elandroid.database.AppDatabase;
 import com.elan_droid.elandroid.database.dao.ProfileDao;
+import com.elan_droid.elandroid.database.entity.User;
 import com.elan_droid.elandroid.database.relation.Profile;
 
 import java.util.ArrayList;
@@ -213,6 +214,65 @@ public class ActiveProfile extends AndroidViewModel {
             if (mmCallback != null) {
                 mmCallback.onFetchProfiles(profiles);
             }
+        }
+    }
+
+    /**
+     *
+     * @param make
+     * @param model
+     * @param name
+     * @param registration
+     */
+    public void newProfile (String name, String make, String model,
+                            String registration, final boolean active, final InternalPopulateProfileCallback listener) {
+        new PopulateAsyncTask(getApplication(), mDatabase, new InternalPopulateProfileCallback() {
+            @Override
+            public void onInsertion(Profile profile) {
+                if (active && profile != null) {
+                    setActiveProfile(profile);
+                }
+                if (listener != null) {
+                    listener.onInsertion(profile);
+                }
+            }
+        }).execute(make, model, name, registration);
+
+    }
+
+    public interface InternalPopulateProfileCallback {
+        void onInsertion (Profile profile);
+    }
+
+    /**
+     * Task for populating the database with a new profile
+     */
+    private static class PopulateAsyncTask extends AsyncTask<String, Void, Profile> {
+
+        private Context mmContext;
+        private AppDatabase mmDatabase;
+        private InternalPopulateProfileCallback mmCallback;
+
+        PopulateAsyncTask (Context context, AppDatabase database, InternalPopulateProfileCallback callback) {
+            mmContext = context;
+            mmDatabase = database;
+            mmCallback = callback;
+        }
+
+        @SuppressWarnings("We should commit because it's already an Async task ")
+        @Override
+        protected Profile doInBackground(String... params) {
+            if(params.length >= 4) {
+                final long vehicleId = mmDatabase.vehicleDao().getId(params[0], params[1]);
+                final long userId = mmDatabase.userVehicleDao().insert(new User(vehicleId, params[2], params[3]));
+                return mmDatabase.profileDao().getProfile(userId);
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Profile profile) {
+            mmCallback.onInsertion(profile);
         }
     }
 

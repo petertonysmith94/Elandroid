@@ -1,7 +1,9 @@
 package com.elan_droid.elandroid.ui.profile;
 
+import android.app.ActionBar;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -20,8 +22,11 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.elan_droid.elandroid.R;
+import com.elan_droid.elandroid.database.relation.Profile;
+import com.elan_droid.elandroid.database.view.ActiveProfile;
 import com.elan_droid.elandroid.database.view.ProfileModel;
 import com.elan_droid.elandroid.database.view.VehicleModel;
+import com.elan_droid.elandroid.ui.generic.MainActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +43,7 @@ public class ProfileNew extends Fragment {
 
     // Database View Models
     private VehicleModel mVModel;
-    private ProfileModel mPModel;
+    private ActiveProfile mActiveProfile;
 
     // Spinner Adapters
     ArrayAdapter<String> mMakeAdapter, mModelAdapter;
@@ -130,7 +135,25 @@ public class ProfileNew extends Fragment {
         String model = mModelSpinner.getSelectedItem().toString();
         String reg = mRegEditText.getText().toString();
         boolean active = mActiveCheck.isChecked();
-        mPModel.newProfile(name, make, model, reg, active);
+
+
+        mActiveProfile.newProfile(name, make, model, reg, active, new ActiveProfile.InternalPopulateProfileCallback() {
+            @Override
+            public void onInsertion(Profile profile) {
+                if (profile == null) {
+                    Toast.makeText(getContext(), "Unable to save the profile", Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    if (mAction == ProfileActivity.ACTION_FORCE) {
+                        Intent intent = MainActivity.getIntent(getContext());
+                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        startActivity(intent);
+                    } else {
+                        getActivity().getSupportFragmentManager().popBackStack();
+                    }
+                }
+            }
+        });
         return true;
     }
 
@@ -144,13 +167,7 @@ public class ProfileNew extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_profile_create:
-                if (parseAndCreate()) {
-                    if (mAction == ProfileActivity.ACTION_FORCE) {
-                        getActivity().finish();
-                    } else {
-                        getActivity().getSupportFragmentManager().popBackStack();
-                    }
-                }
+                parseAndCreate();
                 return true;
 
             default:
@@ -172,7 +189,7 @@ public class ProfileNew extends Fragment {
         }
 
         mVModel = ViewModelProviders.of(this).get(VehicleModel.class);
-        mPModel = ViewModelProviders.of(this).get(ProfileModel.class);
+        mActiveProfile = ViewModelProviders.of(this).get(ActiveProfile.class);
 
         spinnerAdapters();
     }
@@ -182,6 +199,7 @@ public class ProfileNew extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_profile_edit, container, false);
         getActivity().setTitle(getString(R.string.new_profile_title));
+
 
         /** Fetching the UI elements **/
         mNameEditText = (EditText) view.findViewById(R.id.edit_profile_name_edit);
@@ -200,6 +218,8 @@ public class ProfileNew extends Fragment {
 
         /** Forced new profile, therefore we want to set it active no matter what **/
         if (mAction == ACTION_FORCE) {
+
+
             mActiveCheck.setChecked(true);
             mActiveCheck.setVisibility(View.GONE);
         }

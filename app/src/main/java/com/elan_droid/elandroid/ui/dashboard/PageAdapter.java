@@ -6,8 +6,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
 import com.elan_droid.elandroid.database.entity.Page;
-import com.elan_droid.elandroid.database.relation.PageContent;
-import com.elan_droid.elandroid.database.view.PageModel;
+import com.elan_droid.elandroid.database.relation.DetailedPage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,32 +15,36 @@ import java.util.List;
  * Created by Peter Smith
  */
 
-public class DashboardPagerAdapter extends FragmentStatePagerAdapter  {
+public class PageAdapter extends FragmentStatePagerAdapter  {
 
 
-    private List<Page> mPages;
+    private List<DetailedPage> mPages;
 
-    public DashboardPagerAdapter(@NonNull FragmentManager fm) {
-        this (fm, new ArrayList<Page>());
+    public PageAdapter(@NonNull FragmentManager fm) {
+        this (fm, new ArrayList<DetailedPage>());
     }
 
-    public DashboardPagerAdapter(FragmentManager fm, @NonNull List<Page> pages) {
+    public PageAdapter(FragmentManager fm, @NonNull List<DetailedPage> pages) {
         super(fm);
         this.mPages = pages;
     }
 
-    public void addPage(Page page) {
+    public void addPage(DetailedPage page) {
         mPages.add(page);
         notifyDataSetChanged();
     }
 
-    public void updatePages(List<Page> pages) {
+    public void updatePages(List<DetailedPage> pages) {
         mPages.clear();
         mPages.addAll(pages);
         notifyDataSetChanged();
     }
 
     public Page getPage (int position) {
+        return mPages.size() > 0 ? mPages.get(position).getPage() : null;
+    }
+
+    public DetailedPage getDetailedPage (int position) {
         return mPages.get(position);
     }
 
@@ -52,13 +55,13 @@ public class DashboardPagerAdapter extends FragmentStatePagerAdapter  {
 
     @Override
     public Fragment getItem(int position) {
-        final Page page = mPages.get(position);
+        final DetailedPage page = mPages.get(position);
         return BaseDashboardPage.getInstance(page);
     }
 
     @Override
     public CharSequence getPageTitle(int position) {
-        final Page page = mPages.get(position);
+        final Page page = mPages.get(position).getPage();
         String title = "Dashboard";
 
         if (page != null) {

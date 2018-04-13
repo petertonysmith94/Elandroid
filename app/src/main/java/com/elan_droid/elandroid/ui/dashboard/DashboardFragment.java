@@ -17,9 +17,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import com.elan_droid.elandroid.R;
 import com.elan_droid.elandroid.database.entity.Page;
+import com.elan_droid.elandroid.database.entity.PageItem;
+import com.elan_droid.elandroid.database.relation.DetailedPage;
 import com.elan_droid.elandroid.database.relation.Profile;
 import com.elan_droid.elandroid.database.view.PageModel;
 import com.elan_droid.elandroid.ui.dialog.AddPageDialog;
@@ -28,6 +31,7 @@ import com.elan_droid.elandroid.ui.generic.BaseFragment;
 import java.util.List;
 
 import static android.app.Activity.RESULT_OK;
+import static com.elan_droid.elandroid.ui.generic.BaseActivity.NEW_PAGE_ITEM_REQUEST_CODE;
 import static com.elan_droid.elandroid.ui.generic.BaseActivity.NEW_PAGE_REQUEST_CODE;
 
 /**
@@ -44,7 +48,7 @@ public class DashboardFragment extends BaseFragment implements View.OnClickListe
     private PageModel mPageModel;
 
 
-    private DashboardPagerAdapter mPageAdapter;
+    private PageAdapter mPageAdapter;
 
 
     private ViewPager mPager;
@@ -71,7 +75,7 @@ public class DashboardFragment extends BaseFragment implements View.OnClickListe
         Log.d(TAG, "onCreate(savedInstanceState) called");
         setHasOptionsMenu(true);
 
-        mPageAdapter = new DashboardPagerAdapter(getActivity().getSupportFragmentManager());
+        mPageAdapter = new PageAdapter(getActivity().getSupportFragmentManager());
 
         mPageModel = ViewModelProviders.of(getActivity()).get(PageModel.class);
 
@@ -80,7 +84,7 @@ public class DashboardFragment extends BaseFragment implements View.OnClickListe
             @Override
             public void onChanged(@Nullable Profile profile) {
                 if (profile != null) {
-                    fetchPages(profile.getProfileId());
+                    fetchDetailedPages(profile.getProfileId());
                 }
             }
         });
@@ -88,10 +92,10 @@ public class DashboardFragment extends BaseFragment implements View.OnClickListe
         getActivity().setTitle("Dashboard");
     }
 
-    private void fetchPages(long profileId) {
-        mPageModel.fetchPages(profileId, new PageModel.FetchPagesCallback() {
+    private void fetchDetailedPages(long profileId) {
+        mPageModel.fetchDetailedPages(profileId, new PageModel.FetchDetailedPagesCallback() {
             @Override
-            public void onFetch(List<Page> pages) {
+            public void onFetch(List<DetailedPage> pages) {
                 if (pages != null) {
                     mPageAdapter.updatePages(pages);
                 }
@@ -118,7 +122,15 @@ public class DashboardFragment extends BaseFragment implements View.OnClickListe
         switch (item.getItemId()) {
             case R.id.menu_widget_add:
                 Page page = mPageAdapter.getPage (mPager.getCurrentItem());
-                displayDialog(WidgetDialog.getInstance(page));
+
+                if (page != null) {
+                    DialogFragment dialog = PageItemDialog.getInstance(page);
+                    dialog.setTargetFragment(this, NEW_PAGE_ITEM_REQUEST_CODE);
+                    displayDialog(dialog);
+                }
+                else {
+                    Toast.makeText(getContext(), "You need to add a page before adding widgets", Toast.LENGTH_LONG).show();
+                }
                 return true;
 
             default:
@@ -166,16 +178,30 @@ public class DashboardFragment extends BaseFragment implements View.OnClickListe
                     String name = data.getExtras().getString(AddPageDialog.PAGE_NAME_EXTRA);
                     mPageModel.newPage(getActiveProfileId(), name, new PageModel.NewPageCallback() {
                         @Override
-                        public void onPageCreated(Page page) {
+                        public void onPageCreated(DetailedPage page) {
                             mPageAdapter.addPage(page);
                         }
                     });
                 }
                 break;
 
+            case NEW_PAGE_ITEM_REQUEST_CODE:
+                if (resultCode == RESULT_OK) {
+                    PageItem item = data.getExtras().getParcelable(PageItem.EXTRA);
+
+                    if (item != null) {
+                        mPageModel.newPageItem(item);
+                    }
+                }
+                break;
+
             default :
                 super.onActivityResult(requestCode, resultCode, data);
         }
+    }
+
+    public Page getCurrentPage() {
+        return mPageAdapter.getPage(mPager.getCurrentItem());
     }
 
 

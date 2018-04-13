@@ -1,10 +1,17 @@
 package com.elan_droid.elandroid.database.entity;
 
 import android.arch.persistence.room.ColumnInfo;
+import android.arch.persistence.room.Embedded;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.ForeignKey;
+import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
+
+import com.elan_droid.elandroid.database.embedded.Position;
+import com.elan_droid.elandroid.database.embedded.Size;
 
 import static android.arch.persistence.room.ForeignKey.CASCADE;
 
@@ -23,13 +30,15 @@ import static android.arch.persistence.room.ForeignKey.CASCADE;
         )
     }
 )
-public class PageItem {
+public class PageItem implements Parcelable {
+
+    public final static String EXTRA = "com.elan_droid.elandroid.database.entity.EXTRA_PAGE_ITEM";
 
     public final static String TABLE_NAME = "page_item";
     public final static String REFERENCE_COLUMN_ID = "page_item_id";
     public final static String COLUMN_ID = "pageItemId";
     public final static String COLUMN_NAME = "name";
-    public final static String COLUMN_ORDER = "order";
+
 
 
     @PrimaryKey(autoGenerate = true)
@@ -43,13 +52,101 @@ public class PageItem {
     @ColumnInfo(name = COLUMN_NAME, typeAffinity = ColumnInfo.TEXT)
     private String name;
 
-    public PageItem (long id, long pageId, @NonNull String name) {
+    @NonNull
+    @Embedded
+    private Position position;
+
+    @NonNull
+    @Embedded
+    private Size size;
+
+    @Ignore
+    public PageItem () {
+        this (0, 0, "", null, null);
+    }
+
+    public PageItem (long id, long pageId, @NonNull String name, Position position, Size size) {
         this.id = id;
         this.pageId = pageId;
         this.name = name;
+        this.position = position;
+        this.size = size;
     }
 
+    public long getId() {
+        return id;
+    }
 
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public long getPageId() {
+        return pageId;
+    }
+
+    public void setPageId(long pageId) {
+        this.pageId = pageId;
+    }
+
+    @NonNull
+    public String getName() {
+        return name;
+    }
+
+    public void setName(@NonNull String name) {
+        this.name = name;
+    }
+
+    public Position getPosition() {
+        return position;
+    }
+
+    public void setPosition(Position position) {
+        this.position = position;
+    }
+
+    public Size getSize() {
+        return size;
+    }
+
+    public void setSize(Size size) {
+        this.size = size;
+    }
+
+    /**
+     * Constructing the page from a parcel
+     * @param in
+     */
+    @Ignore
+    private PageItem(Parcel in) {
+        id = in.readLong();
+        pageId = in.readLong();
+        name = in.readString();
+    }
+
+    @Override
+    public void writeToParcel(Parcel out, int flags) {
+        out.writeLong(id);
+        out.writeLong(pageId);
+        out.writeString(name);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    public static final Parcelable.Creator<PageItem> CREATOR
+            = new Parcelable.Creator<PageItem>() {
+        public PageItem createFromParcel(Parcel in) {
+            return new PageItem(in);
+        }
+
+        public PageItem[] newArray(int size) {
+            return new PageItem[size];
+        }
+    };
 
 
 }

@@ -18,7 +18,7 @@ public abstract class BaseActivity extends AppCompatActivity implements UpdateDi
 
     // Dialog request codes
     public static final int NEW_PAGE_REQUEST_CODE = 0;
-    public static final int EDIT_PAGE_REQUEST_CODE = 1;
+    public static final int NEW_PAGE_ITEM_REQUEST_CODE = 1;
     public static final int MANAGE_PROFILE_REQUEST_CODE = 3;
     //public static final int EDIT_PAGE_REQUEST_CODE = 1;
 
@@ -29,15 +29,19 @@ public abstract class BaseActivity extends AppCompatActivity implements UpdateDi
         super.onCreate(savedInstanceState);
         Log.d(TAG, "onCreate(savedInstanceState) called");
         setContentView(R.layout.activity_base);
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayShowTitleEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+        }
     }
 
     public Toolbar initToolbar () {
         Log.d(TAG, "setupToolbar");
         return (Toolbar) findViewById(R.id.toolbar);
-    }
-
-    public void setupToolbar(boolean upButton) {
-        setupToolbar(initToolbar(), upButton);
     }
 
     public void setupToolbar(Toolbar toolbar, boolean upButton) {
@@ -46,6 +50,7 @@ public abstract class BaseActivity extends AppCompatActivity implements UpdateDi
 
         if(actionBar != null) {
             actionBar.setDisplayShowTitleEnabled(true);
+            //actionBar.setDisplayShowHomeEnabled(true);
             actionBar.setDisplayHomeAsUpEnabled(upButton);
         }
     }

@@ -3,7 +3,9 @@ package com.elan_droid.elandroid.ui.profile;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
@@ -44,8 +46,6 @@ public class ProfileActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         Log.d(TAG, "onCreate(savedInstanceState) called");
 
-        setupToolbar(true);
-
         Bundle bundle = getIntent().getExtras();
         if (savedInstanceState != null) {
             bundle = savedInstanceState;
@@ -78,34 +78,55 @@ public class ProfileActivity extends BaseActivity {
 
     public void handleAction () {
         FragmentTransaction transition = null;
+        boolean displayUpButton = false;
 
         switch (mAction) {
             case ACTION_MANAGE:
+                displayUpButton = true;
                 transition = getSupportFragmentManager()
                         .beginTransaction()
                         .replace(R.id.content_base, ProfileManage.getInstance());
                 break;
 
             case ACTION_FORCE:
+                displayUpButton = false;
+                Fragment fragment = ProfileNew.getInstanceForce();
+                //fragment.setTargetFragment(fragment, ACTION_FORCE);
                 transition = getSupportFragmentManager()
                     .beginTransaction()
-                    .replace(R.id.content_base, ProfileNew.getInstanceForce());
+                    .replace(R.id.content_base, fragment);
                 break;
 
             case ACTION_NEW:
+                displayUpButton = true;
                 transition = getSupportFragmentManager()
                         .beginTransaction()
                         .replace(R.id.content_base, ProfileNew.getInstanceNew());
                 break;
 
             case ACTION_EDIT:
-
                 break;
         }
 
+
         if (transition != null) {
+            if (displayUpButton) {
+                getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            }
             transition.commit();
+
         }
     }
 
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == ACTION_FORCE) {
+            finish();
+        }
+        else {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
+    }
 }
