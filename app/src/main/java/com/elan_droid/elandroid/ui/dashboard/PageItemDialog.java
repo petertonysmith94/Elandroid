@@ -2,6 +2,7 @@ package com.elan_droid.elandroid.ui.dashboard;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,14 +11,22 @@ import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.Spinner;
 
 import com.elan_droid.elandroid.R;
 import com.elan_droid.elandroid.database.entity.Page;
 import com.elan_droid.elandroid.database.entity.PageItem;
 import com.elan_droid.elandroid.database.embedded.Position;
 import com.elan_droid.elandroid.database.embedded.Size;
+import com.elan_droid.elandroid.database.entity.Parameter;
+import com.elan_droid.elandroid.database.view.ParameterModel;
+import com.elan_droid.elandroid.ui.widget.DisplaySize;
+import com.elan_droid.elandroid.ui.widget.DisplayType;
 
+import java.util.List;
 import java.util.Random;
 
 import static android.app.Activity.RESULT_OK;
@@ -28,9 +37,20 @@ import static android.app.Activity.RESULT_OK;
 
 public class PageItemDialog extends DialogFragment implements DialogInterface.OnClickListener {
 
+    private ParameterModel mParameterModel;
+
     private Page mPage;
 
     private EditText mName;
+
+    private Spinner mParameterSpinner;
+    private ArrayAdapter<Parameter> mParameterAdapter;
+
+    private Spinner mTypeSpinner;
+    private ArrayAdapter<DisplayType> mTypeAdapter;
+
+    private Spinner mSizeSpinner;
+    private ArrayAdapter<DisplaySize> mSizeAdapter;
 
     public static DialogFragment getInstance(Page page) {
         Bundle params = new Bundle();
@@ -45,6 +65,12 @@ public class PageItemDialog extends DialogFragment implements DialogInterface.On
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        mParameterModel = ViewModelProviders.of(getActivity()).get(ParameterModel.class);
+
+        mParameterAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1);
+        mTypeAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1);
+        mSizeAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1);
+
         // Handle argument first!
         if (handleBundle(getArguments())) {
 
@@ -57,7 +83,13 @@ public class PageItemDialog extends DialogFragment implements DialogInterface.On
 
         }
 
-
+        mParameterModel.fetchParameters(mPage.getMessageId(), new ParameterModel.FetchParameterCallback() {
+            @Override
+            public void onFetch(List<Parameter> parameters) {
+                mParameterAdapter.clear();
+                mParameterAdapter.addAll(parameters);
+            }
+        });
     }
 
     private boolean handleBundle(Bundle bundle) {
@@ -73,9 +105,51 @@ public class PageItemDialog extends DialogFragment implements DialogInterface.On
 
         mName = (EditText) view.findViewById(R.id.dashboard_add_widget_name);
 
+        mParameterSpinner = (Spinner) view.findViewById(R.id.dashboard_add_widget_parameter);
+        mParameterSpinner.setAdapter(mParameterAdapter);
+
+        mTypeSpinner = (Spinner) view.findViewById(R.id.dashboard_add_widget_type);
+        mTypeSpinner.setAdapter(mTypeAdapter);
+
+        mSizeSpinner = (Spinner) view.findViewById(R.id.dashboard_add_widget_size);
+        mSizeSpinner.setAdapter(mSizeAdapter);
+
+        mParameterSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
+                Parameter parameter = mParameterAdapter.getItem(position);
+                mName.setText(parameter.getName());
+
+                mTypeAdapter.clear();
+                mTypeAdapter.addAll(parameter.getDisplays());
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
+        mTypeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
+                DisplayType type = mTypeAdapter.getItem(position);
+
+                mSizeAdapter.clear();
+                mSizeAdapter.addAll(type.getSizes());
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
 
         return view;
     }
+
+
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -97,26 +171,23 @@ public class PageItemDialog extends DialogFragment implements DialogInterface.On
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+
     }
 
     // TODO: add error focuses on fields
     private PageItem parse() {
-        PageItem item = new PageItem();
         boolean error = false;
 
-        item.setName(mName.getText().toString());
-        if (item.getName() == "") {
+        String name = mName.getText().toString();
+        if (name == "") {
             error = true;
         }
 
-        Random random = new Random();
+        Parameter parameter = (Parameter) mParameterSpinner.getSelectedItem();
 
-        item.setPosition(new Position(random.nextInt(300), random.nextInt(500)));
-        item.setSize(new Size(random.nextInt(100), random.nextInt(100)));
+        Size size = new Size(mSizeAdapter.getItem(mSizeSpinner.getSelectedItemPosition()));
 
-        item.setPageId(mPage.getId());
-
-        return error ? null : item;
+        return error ? null : new PageItem(mPage.getId(), parameter.getId(), name, new Position(0, 0), size);
     }
 
     @Override

@@ -8,19 +8,28 @@ import android.arch.persistence.room.migration.Migration;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
+import com.elan_droid.elandroid.database.dao.MessageDao;
 import com.elan_droid.elandroid.database.dao.PageDao;
 import com.elan_droid.elandroid.database.dao.PageItemDao;
+import com.elan_droid.elandroid.database.dao.ParameterDao;
 import com.elan_droid.elandroid.database.dao.ProfileDao;
 import com.elan_droid.elandroid.database.dao.TripDao;
 import com.elan_droid.elandroid.database.dao.UserDao;
 import com.elan_droid.elandroid.database.dao.VehicleDao;
+import com.elan_droid.elandroid.database.entity.FormattedParameter;
+import com.elan_droid.elandroid.database.entity.Message;
 import com.elan_droid.elandroid.database.entity.Page;
 import com.elan_droid.elandroid.database.entity.PageItem;
+import com.elan_droid.elandroid.database.entity.Parameter;
+import com.elan_droid.elandroid.database.entity.ParameterBitwise8;
 import com.elan_droid.elandroid.database.entity.Trip;
 import com.elan_droid.elandroid.database.entity.User;
 import com.elan_droid.elandroid.database.entity.Vehicle;
 import com.elan_droid.elandroid.database.model.LotusElanS2;
+import com.elan_droid.elandroid.database.model.PrepopulateModel;
+import com.elan_droid.elandroid.database.relation.Command;
 
+import java.util.List;
 import java.util.concurrent.Executors;
 
 /**
@@ -30,8 +39,8 @@ import java.util.concurrent.Executors;
     version = 1,
     exportSchema = false,
     entities = {
-        Vehicle.class, User.class, Page.class, PageItem.class,
-            Trip.class
+        Vehicle.class, User.class, Message.class, Page.class, PageItem.class,
+            Trip.class, ParameterBitwise8.class, FormattedParameter.class
     }
 )
 public abstract class AppDatabase extends RoomDatabase {
@@ -44,13 +53,18 @@ public abstract class AppDatabase extends RoomDatabase {
 
     private static AppDatabase INSTANCE;
 
+    private static final PrepopulateModel[] MODELS = new PrepopulateModel[] {
+        new LotusElanS2 ()
+    };
+
     public static AppDatabase getInstance(final Context context) {
         if (INSTANCE == null) {
             INSTANCE = Room.databaseBuilder(
-                    context.getApplicationContext(),
-                    AppDatabase.class,
-                    DATABASE_NAME
-            ).fallbackToDestructiveMigration()
+                context.getApplicationContext(),
+                AppDatabase.class,
+                DATABASE_NAME
+            )
+            .fallbackToDestructiveMigration()
             .addCallback(new Callback() {
                 @Override
                 public void onCreate(@NonNull SupportSQLiteDatabase db) {
@@ -59,7 +73,16 @@ public abstract class AppDatabase extends RoomDatabase {
                     Executors.newSingleThreadExecutor().execute(new Runnable() {
                         @Override
                         public void run() {
-                            getInstance(context).vehicleDao().insert(LotusElanS2.getVehicle());
+                            AppDatabase database = getInstance(context);
+
+                            for (PrepopulateModel model : MODELS) {
+                                database.vehicleDao().insert(model.getVehicle());
+
+                                for (Command c : model.getCommands()) {
+                                    database.messageDao().insert(c.getMessage());
+                                    database.parameterDao().insert(c.getParametersArray());
+                                }
+                            }
                         }
                     });
                 }
@@ -69,36 +92,22 @@ public abstract class AppDatabase extends RoomDatabase {
         return INSTANCE;
     }
 
+    public abstract ProfileDao profileDao();
+
     public abstract VehicleDao vehicleDao();
 
     public abstract UserDao userVehicleDao();
 
-    public abstract ProfileDao profileDao();
+    public abstract MessageDao messageDao();
 
     public abstract PageDao pageDao();
 
-    public abstract PageItemDao pageItemDao();
-
     public abstract TripDao tripDao();
 
-    /**
-     * Callback for prepopulating the database with vehicle models
-     */
-    private static class Prepopulate extends Callback {
+    public abstract ParameterDao parameterDao();
 
-        private Context mContext;
+    public abstract PageItemDao pageItemDao();
 
-        public Prepopulate(final Context context) {
-            this.mContext = context;
-        }
-
-        @Override
-        public void onCreate(SupportSQLiteDatabase db) {
-            super.onCreate(db);
-
-
-        }
-    }
 
     static final Migration MIGRATION_1_2 = new Migration(1, 2) {
         @Override

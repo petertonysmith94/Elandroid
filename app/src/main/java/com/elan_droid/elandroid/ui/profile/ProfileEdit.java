@@ -21,6 +21,7 @@ import android.widget.Toast;
 
 import com.elan_droid.elandroid.R;
 import com.elan_droid.elandroid.database.relation.Profile;
+import com.elan_droid.elandroid.database.view.ActiveProfile;
 import com.elan_droid.elandroid.database.view.ProfileModel;
 
 import java.util.ArrayList;
@@ -29,12 +30,12 @@ import java.util.ArrayList;
  * Created by Peter Smith
  */
 
-public class ProfileEdit extends Fragment implements ProfileModel.FetchProfileCallback {
+public class ProfileEdit extends Fragment implements ActiveProfile.FetchActiveProfileCallback {
 
     public static final String TAG = "ProfileEdit";
 
     // Database View Models
-    private ProfileModel mPModel;
+    private ActiveProfile mProfileModel;
     //private UserVehicleModel mUVModel;
 
     // Spinner Adapters
@@ -84,7 +85,7 @@ public class ProfileEdit extends Fragment implements ProfileModel.FetchProfileCa
         mCurrProfile.setRegistration(reg);
 
         // Update the profile for the  current profile
-        mPModel.updateProfile(mCurrProfile, active, new ProfileModel.UpdateProfileCallback() {
+        mProfileModel.updateProfile(mCurrProfile, active, new ActiveProfile.UpdateProfileCallback() {
             @Override
             public void onProfileUpdated(boolean success) {
                 if (success) {
@@ -127,14 +128,14 @@ public class ProfileEdit extends Fragment implements ProfileModel.FetchProfileCa
         .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                mPModel.deleteProfile(mCurrProfile, new ProfileModel.DeleteProfileCallback() {
+                mProfileModel.deleteProfile(mCurrProfile, new ActiveProfile.DeleteProfileCallback() {
                     @Override
                     public void onProfileDeleted(boolean success) {
                         if (success) {
                             getActivity().getSupportFragmentManager().popBackStack();
                         }
                         else {
-                            Toast.makeText(getActivity(), "The profile deltetion was unsuccessful!", Toast.LENGTH_LONG).show();
+                            Toast.makeText(getActivity(), "The profile deletion was unsuccessful!", Toast.LENGTH_LONG).show();
                         }
                     }
                 });
@@ -164,23 +165,29 @@ public class ProfileEdit extends Fragment implements ProfileModel.FetchProfileCa
         }
 
         mUpdated = false;
+        mProfileModel = ViewModelProviders.of(this).get(ActiveProfile.class);
 
+        // If not equal to 0, then we can try fetch the profile
         if (mUserVehicleId != 0) {
-            mPModel = ViewModelProviders.of(this).get(ProfileModel.class);
-            mPModel.fetchProfile(mUserVehicleId, this);
+            mProfileModel.fetchProfile(mUserVehicleId, this);
         }
+        // Otherwise transition back with an error
         else {
-            onProfileFetched(null);
+            transitionError();
         }
 
     }
 
+    public void transitionError() {
+        getActivity().getSupportFragmentManager().popBackStack();
+        Toast.makeText(getContext(), R.string.edit_profile_error_profile_missing, Toast.LENGTH_LONG).show();
+    }
+
     @Override
-    public void onProfileFetched(Profile profile) {
+    public void onFetch(Profile profile) {
         // We return an error to the user and pop back the stack
         if (profile == null) {
-            getActivity().getSupportFragmentManager().popBackStack();
-            Toast.makeText(getContext(), R.string.edit_profile_error_profile_missing, Toast.LENGTH_LONG).show();
+            transitionError();
         }
 
         else {

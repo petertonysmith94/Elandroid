@@ -5,7 +5,9 @@ import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.Relation;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.v4.app.Fragment;
 
+import com.elan_droid.elandroid.database.embedded.Position;
 import com.elan_droid.elandroid.database.entity.Page;
 import com.elan_droid.elandroid.database.entity.PageItem;
 
@@ -29,6 +31,9 @@ public class DetailedPage implements Parcelable {
     )
     public List<PageItem> items;
 
+    @Ignore
+    private Fragment target;
+
     public DetailedPage (Page page) {
         this (page, new ArrayList<PageItem>());
     }
@@ -40,6 +45,22 @@ public class DetailedPage implements Parcelable {
 
     public List<PageItem> getItems() {
         return items;
+    }
+
+    public boolean setItem (PageItem oldItem, PageItem newItem) {
+        final int index = items.indexOf(oldItem);
+        boolean result = (index != -1);
+
+        if (result) {
+            result = ( items.set(index, newItem) != null);
+        }
+        return result;
+    }
+
+    public boolean setItemPosition (final PageItem oldItem, Position newPosition) {
+        PageItem newItem = oldItem;
+        newItem.setPosition(newPosition);
+        return setItem(oldItem, newItem);
     }
 
     public void setItems(List<PageItem> items) {
@@ -54,13 +75,21 @@ public class DetailedPage implements Parcelable {
         this.page = page;
     }
 
+    public Fragment getTarget() {
+        return target;
+    }
+
+    public void setTarget(Fragment target) {
+        this.target = target;
+    }
+
     /**
      * Constructing the page from a parcel
      * @param in
      */
     @Ignore
     private DetailedPage(Parcel in) {
-        page = (Page) in.readParcelable(Page.class.getClassLoader());
+        page = in.readParcelable(Page.class.getClassLoader());
         items = new ArrayList<>();
         in.readTypedList(items, PageItem.CREATOR);
     }
@@ -86,5 +115,7 @@ public class DetailedPage implements Parcelable {
             return new DetailedPage[size];
         }
     };
+
+
 
 }

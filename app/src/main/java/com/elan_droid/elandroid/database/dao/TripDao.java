@@ -16,7 +16,7 @@ import java.util.List;
  * Created by Peter Smith
  */
 @Dao
-public abstract class TripDao extends BaseDao<Trip> {
+public abstract class TripDao implements BaseDao<Trip> {
 
     @Query("SELECT * " +
             " FROM " + Trip.TABLE_NAME +

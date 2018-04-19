@@ -7,6 +7,7 @@ import android.arch.persistence.room.Transaction;
 
 import com.elan_droid.elandroid.database.entity.User;
 import com.elan_droid.elandroid.database.entity.Vehicle;
+import com.elan_droid.elandroid.database.relation.MinimalProfile;
 import com.elan_droid.elandroid.database.relation.Profile;
 
 import java.util.List;

@@ -1,12 +1,13 @@
 package com.elan_droid.elandroid.database.view;
 
 import android.app.Application;
-import android.arch.lifecycle.AndroidViewModel;
+import android.arch.lifecycle.MutableLiveData;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 
 import com.elan_droid.elandroid.database.AppDatabase;
 import com.elan_droid.elandroid.database.entity.Page;
+import com.elan_droid.elandroid.database.entity.PageItem;
 import com.elan_droid.elandroid.database.relation.DetailedPage;
 
 import java.util.List;
@@ -19,22 +20,49 @@ public class PageModel extends PageItemModel {
 
     private AppDatabase mDatabase;
 
+    private MutableLiveData<List<DetailedPage>> mPages;
+    private long mUserId;
+
     public PageModel(@NonNull Application application) {
         super(application);
 
         this.mDatabase = AppDatabase.getInstance(application);
+        this.mPages = new MutableLiveData<>();
     }
 
-
-
-    public void newPage (long userId, String name, NewPageCallback callback) {
-        new PopulateAsyncTask(mDatabase, callback).execute(new Page(0, userId, name, 0));
+    public MutableLiveData<List<DetailedPage>> getPages() {
+        return mPages;
     }
 
-    public interface NewPageCallback {
+    private void updatePages (long userId) {
+        if (mPages.hasObservers()) {
+            fetchDetailedPages(userId, new FetchDetailedPagesCallback() {
+                @Override
+                public void onFetch(List<DetailedPage> pages) {
+                    mPages.postValue(pages);
+                }
+            });
+        }
+    }
 
-        public void onPageCreated (DetailedPage page);
+    public void setUserId (long userId) {
+        if (this.mUserId != userId) {
+            this.mUserId = userId;
+            updatePages(userId);
+        }
+    }
 
+    /**
+     * Creates a new page on the dashboard
+     * @param page      the page object
+     * @param callback  the callback for onCreate of page
+     */
+    public void createPage(Page page, CreatePageCallback callback) {
+        new PopulateAsyncTask(mDatabase, callback).execute(page);
+    }
+
+    public interface CreatePageCallback {
+        public void onCreate(DetailedPage page);
     }
 
     /**
@@ -43,9 +71,9 @@ public class PageModel extends PageItemModel {
     private static class PopulateAsyncTask extends AsyncTask<Page, Void, Page> {
 
         private AppDatabase mmDatabase;
-        private NewPageCallback mmCallback;
+        private CreatePageCallback mmCallback;
 
-        PopulateAsyncTask (AppDatabase database, NewPageCallback callback) {
+        PopulateAsyncTask (AppDatabase database, CreatePageCallback callback) {
             mmDatabase = database;
             mmCallback = callback;
         }
@@ -66,7 +94,55 @@ public class PageModel extends PageItemModel {
         @Override
         protected void onPostExecute(Page page) {
             if (mmCallback != null) {
-                mmCallback.onPageCreated(new DetailedPage(page));
+                mmCallback.onCreate(new DetailedPage(page));
+            }
+        }
+    }
+
+    public void newPageItem (PageItem item) {
+        new PopulatePageItemAsyncTask(mDatabase, new CreatePageItemCallback() {
+            @Override
+            public void onCreate(PageItem item) {
+                updatePages(mUserId);
+            }
+        }).execute(item);
+    }
+
+    public interface CreatePageItemCallback {
+        void onCreate (PageItem item);
+    }
+
+    /**
+     * Task for populating the database with a new profile
+     */
+    private static class PopulatePageItemAsyncTask extends AsyncTask<PageItem, Void, PageItem> {
+
+        private AppDatabase mmDatabase;
+        private CreatePageItemCallback mmCallback;
+
+        PopulatePageItemAsyncTask (AppDatabase database, CreatePageItemCallback callback) {
+            mmDatabase = database;
+            mmCallback = callback;
+        }
+
+        @Override
+        protected PageItem doInBackground(PageItem... params) {
+            if(params.length > 0) {
+                final PageItem item = params[0];
+                final long id = mmDatabase.pageItemDao().insert(item);
+
+                if (id != 0) {
+                    item.setId(id);
+                    return item;
+                }
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(PageItem page) {
+            if (mmCallback != null) {
+                //mmCallback.onCreate(new DetailedPage(page));
             }
         }
     }
@@ -152,6 +228,8 @@ public class PageModel extends PageItemModel {
         }
 
     }
+
+
 
 
 

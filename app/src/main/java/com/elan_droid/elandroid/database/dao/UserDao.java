@@ -11,7 +11,7 @@ import com.elan_droid.elandroid.database.entity.User;
  * Created by Peter Smith
  */
 @Dao
-public abstract class UserDao extends BaseDao<User> {
+public abstract class UserDao implements BaseDao<User> {
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
     public abstract void update (User user);

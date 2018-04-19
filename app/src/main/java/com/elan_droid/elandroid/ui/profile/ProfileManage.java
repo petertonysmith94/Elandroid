@@ -18,8 +18,10 @@ import android.view.ViewGroup;
 import com.elan_droid.elandroid.R;
 import com.elan_droid.elandroid.adapter.ProfileAdapter;
 import com.elan_droid.elandroid.database.relation.Profile;
+import com.elan_droid.elandroid.database.view.ActiveProfile;
 import com.elan_droid.elandroid.database.view.ProfileModel;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -33,7 +35,7 @@ public class ProfileManage extends Fragment {
 
 
     // Database View Models
-    private ProfileModel mProfileModel;
+    private ActiveProfile mProfileModel;
 
 
     // UI variables
@@ -77,10 +79,9 @@ public class ProfileManage extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mProfileModel = ViewModelProviders.of(this).get(ProfileModel.class);
-        List<Profile> profiles = mProfileModel.getProfiles().getValue();
+        mProfileModel = ViewModelProviders.of(this).get(ActiveProfile.class);
 
-        mProfileAdapter = new ProfileAdapter(profiles, new ProfileAdapter.OnProfileSelectedListener() {
+        mProfileAdapter = new ProfileAdapter(new ArrayList<Profile>(), new ProfileAdapter.OnProfileSelectedListener() {
             @Override
             public void onProfileSelected(Profile profile) {
                 // Start the ProfileEdit framgent
@@ -93,7 +94,7 @@ public class ProfileManage extends Fragment {
             }
         });
 
-        mProfileModel.getProfiles().observe(this, new Observer<List<Profile>>() {
+        mProfileModel.getActiveProfiles().observe(this, new Observer<List<Profile>>() {
             @Override
             public void onChanged(@Nullable List<Profile> profiles) {
                 mProfileAdapter.update(profiles);

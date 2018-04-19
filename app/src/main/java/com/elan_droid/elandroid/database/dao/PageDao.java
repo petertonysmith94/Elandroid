@@ -14,7 +14,7 @@ import java.util.List;
  * Created by Peter Smith
  */
 @Dao
-public abstract class PageDao extends BaseDao<Page> {
+public abstract class PageDao implements BaseDao<Page> {
 
     @Query("SELECT *" +
             " FROM " + Page.TABLE_NAME +

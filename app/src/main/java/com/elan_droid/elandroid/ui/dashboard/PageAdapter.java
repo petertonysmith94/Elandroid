@@ -36,7 +36,10 @@ public class PageAdapter extends FragmentStatePagerAdapter  {
 
     public void updatePages(List<DetailedPage> pages) {
         mPages.clear();
-        mPages.addAll(pages);
+
+        if (pages != null)
+            mPages.addAll(pages);
+
         notifyDataSetChanged();
     }
 
@@ -53,10 +56,13 @@ public class PageAdapter extends FragmentStatePagerAdapter  {
         return mPages.size();
     }
 
+
     @Override
     public Fragment getItem(int position) {
         final DetailedPage page = mPages.get(position);
-        return BaseDashboardPage.getInstance(page);
+        Fragment fragment = BaseDashboardPage.getInstance(page);
+        page.setTarget(fragment);
+        return fragment;
     }
 
     @Override

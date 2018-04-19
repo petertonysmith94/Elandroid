@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="AnalogDialWidget">
+        <!-- dynamic attributes -->
+        <attr name="value" format="float" />
+
+        <!-- theme attributes -->
+        <attr name="minValue" format="float" />
+        <attr name="maxValue" format="float" />
+        <attr name="startAngle" format="integer" />
+        <attr name="finishAngle" format="integer" />
+
+        <attr name="primaryTickCount" format="integer" />
+        <attr name="primaryTickOuterRadMultiplier" format="float" />
+        <attr name="primaryTickInnerRadMultiplier" format="float" />
+        <attr name="primaryTickColour" format="color" />
+        <attr name="primaryTickStrokeWidth" format="float" />
+        <attr name="primaryTickStrokeCap" format="string" />
+        <attr name="primaryTickAntiAlias" format="boolean" />
+
+        <attr name="primaryTextRadMultiplier" format="float" />
+        <attr name="primaryTextColour" format="color" />
+
+        <attr name="secondaryTickCount" format="integer" />
+        <attr name="secondaryTickOuterRadMultiplier" format="float" />
+        <attr name="secondaryTickInnerRadMultiplier" format="float" />
+        <attr name="secondaryTickColour" format="color" />
+        <attr name="secondaryTickStrokeWidth" format="float" />
+        <attr name="secondaryTickStrokeCap" format="string" />
+        <attr name="secondaryTickAntiAlias" format="boolean" />
+
+        <attr name="needleOuterRadMultiplier" format="float" />
+        <attr name="needleInnerRadMultiplier" format="float" />
+        <attr name="needleColour" format="color" />
+        <attr name="needleStrokeWidth" format="float" />
+        <attr name="needleStrokeCap" format="string" />
+        <attr name="needleAntiAlias" format="boolean" />
+
+    </declare-styleable>
+</resources>

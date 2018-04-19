@@ -7,7 +7,7 @@ import android.arch.persistence.room.Insert;
  * Created by Peter Smith
  */
 
-public abstract class BaseDao<T> {
+interface BaseDao<T> {
 
     @Insert
     public abstract long insert (T element);

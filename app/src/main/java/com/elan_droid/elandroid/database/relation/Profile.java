@@ -43,6 +43,10 @@ public class Profile {
         return user.getId();
     }
 
+    public long getDefaultMessageId() {
+        return vehicle.getDefaultMessageId();
+    }
+
     /**
      * The name of the User
      * @return      the name of the user vehicle

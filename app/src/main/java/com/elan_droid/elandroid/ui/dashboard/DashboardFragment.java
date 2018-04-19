@@ -78,13 +78,19 @@ public class DashboardFragment extends BaseFragment implements View.OnClickListe
         mPageAdapter = new PageAdapter(getActivity().getSupportFragmentManager());
 
         mPageModel = ViewModelProviders.of(getActivity()).get(PageModel.class);
-
+        mPageModel.getPages().observe(this, new Observer<List<DetailedPage>>() {
+            @Override
+            public void onChanged(@Nullable List<DetailedPage> detailedPages) {
+                mPager.removeAllViews();
+                mPageAdapter.updatePages(detailedPages);
+            }
+        });
 
         getProfileModel().getActiveProfile().observe(this, new Observer<Profile>() {
             @Override
             public void onChanged(@Nullable Profile profile) {
                 if (profile != null) {
-                    fetchDetailedPages(profile.getProfileId());
+                    mPageModel.setUserId(profile.getProfileId());
                 }
             }
         });
@@ -92,15 +98,9 @@ public class DashboardFragment extends BaseFragment implements View.OnClickListe
         getActivity().setTitle("Dashboard");
     }
 
-    private void fetchDetailedPages(long profileId) {
-        mPageModel.fetchDetailedPages(profileId, new PageModel.FetchDetailedPagesCallback() {
-            @Override
-            public void onFetch(List<DetailedPage> pages) {
-                if (pages != null) {
-                    mPageAdapter.updatePages(pages);
-                }
-            }
-        });
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
     }
 
     @Override
@@ -176,9 +176,11 @@ public class DashboardFragment extends BaseFragment implements View.OnClickListe
             case NEW_PAGE_REQUEST_CODE:
                 if (resultCode == RESULT_OK) {
                     String name = data.getExtras().getString(AddPageDialog.PAGE_NAME_EXTRA);
-                    mPageModel.newPage(getActiveProfileId(), name, new PageModel.NewPageCallback() {
+                    final Profile profile = getActiveProfile();
+                    Page page = new Page(profile.getProfileId(), profile.getDefaultMessageId(), name);
+                    mPageModel.createPage(page, new PageModel.CreatePageCallback() {
                         @Override
-                        public void onPageCreated(DetailedPage page) {
+                        public void onCreate(DetailedPage page) {
                             mPageAdapter.addPage(page);
                         }
                     });

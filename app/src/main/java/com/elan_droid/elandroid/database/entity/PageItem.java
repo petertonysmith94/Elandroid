@@ -27,6 +27,13 @@ import static android.arch.persistence.room.ForeignKey.CASCADE;
             childColumns = Page.REFERENCE_COLUMN_ID,
             onDelete = CASCADE,
             onUpdate = CASCADE
+        ),
+        @ForeignKey (
+            entity = FormattedParameter.class,
+            parentColumns = Parameter.COLUMN_ID,
+            childColumns = Parameter.REFERENCE_COLUMN_ID,
+            onDelete = CASCADE,
+            onUpdate = CASCADE
         )
     }
 )
@@ -40,13 +47,15 @@ public class PageItem implements Parcelable {
     public final static String COLUMN_NAME = "name";
 
 
-
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = COLUMN_ID, typeAffinity = ColumnInfo.INTEGER)
     private long id;
 
     @ColumnInfo (name = Page.REFERENCE_COLUMN_ID, typeAffinity = ColumnInfo.INTEGER)
     private long pageId;
+
+    @ColumnInfo (name = Parameter.REFERENCE_COLUMN_ID, typeAffinity = ColumnInfo.INTEGER)
+    private long parameterId;
 
     @NonNull
     @ColumnInfo(name = COLUMN_NAME, typeAffinity = ColumnInfo.TEXT)
@@ -61,13 +70,14 @@ public class PageItem implements Parcelable {
     private Size size;
 
     @Ignore
-    public PageItem () {
-        this (0, 0, "", null, null);
+    public PageItem (long pageId, long parameterId, @NonNull String name, Position position, Size size) {
+        this (0, pageId, parameterId, name, position, size);
     }
 
-    public PageItem (long id, long pageId, @NonNull String name, Position position, Size size) {
+    public PageItem (long id, long pageId, long parameterId, @NonNull String name, Position position, Size size) {
         this.id = id;
         this.pageId = pageId;
+        this.parameterId = parameterId;
         this.name = name;
         this.position = position;
         this.size = size;
@@ -89,6 +99,14 @@ public class PageItem implements Parcelable {
         this.pageId = pageId;
     }
 
+    public long getParameterId() {
+        return parameterId;
+    }
+
+    public void setParameterId(long parameterId) {
+        this.parameterId = parameterId;
+    }
+
     @NonNull
     public String getName() {
         return name;
@@ -102,7 +120,7 @@ public class PageItem implements Parcelable {
         return position;
     }
 
-    public void setPosition(Position position) {
+    public void setPosition(@NonNull Position position) {
         this.position = position;
     }
 
@@ -115,21 +133,27 @@ public class PageItem implements Parcelable {
     }
 
     /**
-     * Constructing the page from a parcel
+     * Constructing a PageItem from a parcel
      * @param in
      */
     @Ignore
     private PageItem(Parcel in) {
         id = in.readLong();
         pageId = in.readLong();
+        parameterId = in.readLong();
         name = in.readString();
+        position = in.readParcelable(Position.class.getClassLoader());
+        size = in.readParcelable(Size.class.getClassLoader());
     }
 
     @Override
     public void writeToParcel(Parcel out, int flags) {
         out.writeLong(id);
         out.writeLong(pageId);
+        out.writeLong(parameterId);
         out.writeString(name);
+        out.writeParcelable(position, flags);
+        out.writeParcelable(size, flags);
     }
 
     @Override
@@ -149,4 +173,14 @@ public class PageItem implements Parcelable {
     };
 
 
+    @Override
+    public String toString() {
+        return "PageItem{" +
+                "id=" + id +
+                ", pageId=" + pageId +
+                ", name='" + name + '\'' +
+                ", position=" + position +
+                ", size=" + size +
+                '}';
+    }
 }

@@ -134,10 +134,11 @@ public class ActiveProfile extends AndroidViewModel {
     }
 
 
+    public void fetchProfile (long profileId, FetchActiveProfileCallback callback) {
+        new FetchAsyncTask(mDatabase, callback).execute(profileId);
+    }
 
-
-
-    private interface FetchActiveProfileCallback {
+    public interface FetchActiveProfileCallback {
         void onFetch (Profile profile);
     }
 
@@ -162,7 +163,9 @@ public class ActiveProfile extends AndroidViewModel {
 
         @Override
         protected void onPostExecute(Profile profile) {
-            mmCallback.onFetch(profile);
+            if (mmCallback != null) {
+                mmCallback.onFetch(profile);
+            }
         }
     }
 
@@ -275,5 +278,117 @@ public class ActiveProfile extends AndroidViewModel {
             mmCallback.onInsertion(profile);
         }
     }
+
+    public void updateProfile(final Profile profile, final boolean active, final UpdateProfileCallback callback){
+        new UpdateAsyncTask(mDatabase, new UpdateProfileCallback() {
+            @Override
+            public void onProfileUpdated(boolean success) {
+                if (active) {
+                    setActiveProfile(profile);
+                }
+                if (callback != null) {
+                    callback.onProfileUpdated(success);
+                }
+            }
+        }).execute(profile);
+    }
+
+    public interface UpdateProfileCallback {
+
+        void onProfileUpdated (boolean success);
+
+    }
+
+    /**
+     * Task for populating the database with a new profile
+     */
+    private static class UpdateAsyncTask extends AsyncTask<Profile, Void, Boolean> {
+
+        private AppDatabase mmDatabase;
+        private UpdateProfileCallback mmCallback;
+
+        UpdateAsyncTask (AppDatabase database, UpdateProfileCallback callback) {
+            mmDatabase = database;
+            mmCallback = callback;
+        }
+
+        @SuppressWarnings("We should commit because it's already an Async task ")
+        @Override
+        protected Boolean doInBackground(Profile... params) {
+            User user;
+
+            if(params.length > 0 && params[0] != null && (user = params[0].getUser()) != null) {
+                mmDatabase.userVehicleDao().update(user);
+                return true;
+            }
+            return false;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean success) {
+            if (mmCallback != null) {
+                mmCallback.onProfileUpdated(success);
+            }
+        }
+    }
+
+    public void deleteProfile(final Profile profile, final DeleteProfileCallback callback) {
+        new DeleteAsyncTask(mDatabase, new InternalDeleteProfileCallback() {
+            @Override
+            public void onProfileDeleted(long profileId) {
+                if (profileId != -1 && profile.getProfileId() != profileId) {
+                    //setActiveProfileId(profile);
+                }
+
+                if (callback != null) {
+                    callback.onProfileDeleted(profileId != -1);
+                }
+            }
+        }).execute(profile);
+
+    }
+
+    public interface DeleteProfileCallback {
+
+        void onProfileDeleted (boolean success);
+
+    }
+
+    private interface InternalDeleteProfileCallback {
+
+        void onProfileDeleted (long profileId);
+
+    }
+
+    private static class DeleteAsyncTask extends AsyncTask<Profile, Void, Long> {
+        private AppDatabase mmDatabase;
+        private InternalDeleteProfileCallback mmCallback;
+
+        DeleteAsyncTask (AppDatabase database, InternalDeleteProfileCallback callback) {
+            this.mmDatabase = database;
+            this.mmCallback = callback;
+        }
+
+        @Override
+        protected Long doInBackground(Profile... params) {
+            long id = -1;
+
+            if (params.length > 0 && params[0] != null) {
+                id = params[0].getProfileId();
+                mmDatabase.userVehicleDao().delete(params[0].getUser());
+
+                if (params[0].isActive()) {
+                    id = mmDatabase.userVehicleDao().fetchOne();
+                }
+            }
+            return id;
+        }
+
+        @Override
+        protected void onPostExecute(Long result) {
+            mmCallback.onProfileDeleted(result);
+        }
+    }
+
 
 }

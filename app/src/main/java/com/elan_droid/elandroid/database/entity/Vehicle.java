@@ -2,33 +2,41 @@ package com.elan_droid.elandroid.database.entity;
 
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
+import android.support.annotation.Nullable;
+
+import java.util.List;
 
 /**
  * Created by Peter Smith
  */
 @Entity(
 tableName = Vehicle.TABLE_NAME,
-indices = {
-    @Index (
-        value = { Vehicle.COLUMN_MAKE, Vehicle.COLUMN_MODEL },
-        unique = true
-    )
-}
+    indices = {
+        @Index (
+            value = { Vehicle.COLUMN_MAKE, Vehicle.COLUMN_MODEL },
+            unique = true
+        )
+    }
 )
 public class Vehicle {
 
     public final static String TABLE_NAME = "vehicle";
     public final static String REFERENCE_COLUMN_ID = "vehicle_id";
     public final static String COLUMN_ID = "vid";
+
     public final static String COLUMN_MAKE = "make";
     public final static String COLUMN_MODEL = "model";
 
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = COLUMN_ID, typeAffinity = ColumnInfo.INTEGER)
     public long mId;
+
+    @ColumnInfo (name = Message.REFERENCE_COLUMN_ID, typeAffinity = ColumnInfo.INTEGER)
+    private long defaultMessageId;
 
     @ColumnInfo (name =  COLUMN_MAKE, typeAffinity = ColumnInfo.TEXT)
     private String mMake;
@@ -38,11 +46,12 @@ public class Vehicle {
 
     @Ignore
     public Vehicle(String make, String model) {
-        this (0, make, model);
+        this (0, -1, make, model);
     }
 
-    public Vehicle(long id, String make, String model) {
+    public Vehicle(long id, long defaultMessageId, String make, String model) {
         this.mId = id;
+        this.defaultMessageId = defaultMessageId;
         this.mMake = make;
         this.mModel = model;
     }
@@ -53,6 +62,14 @@ public class Vehicle {
 
     public void setId(long id) {
         this.mId = id;
+    }
+
+    public long getDefaultMessageId() {
+        return defaultMessageId;
+    }
+
+    public void setDefaultMessageId(long defaultMessageId) {
+        this.defaultMessageId = defaultMessageId;
     }
 
     public String getMake() {

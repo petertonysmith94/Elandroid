@@ -16,13 +16,22 @@ import static android.arch.persistence.room.ForeignKey.CASCADE;
  */
 @Entity (
     tableName = Page.TABLE_NAME,
-    foreignKeys = @ForeignKey (
-        entity = User.class,
-        parentColumns = User.COLUMN_ID,
-        childColumns = User.REFERENCE_COLUMN_ID,
-        onDelete = CASCADE,
-        onUpdate = CASCADE
-    )
+    foreignKeys = {
+        @ForeignKey (
+            entity = User.class,
+            parentColumns = User.COLUMN_ID,
+            childColumns = User.REFERENCE_COLUMN_ID,
+            onDelete = CASCADE,
+            onUpdate = CASCADE
+        ),
+        @ForeignKey (
+            entity = Message.class,
+            parentColumns = Message.COLUMN_ID,
+            childColumns = Message.REFERENCE_COLUMN_ID,
+            onDelete = CASCADE,
+            onUpdate = CASCADE
+        )
+    }
 )
 public class Page implements Parcelable
 {
@@ -42,6 +51,9 @@ public class Page implements Parcelable
     @ColumnInfo (name = User.REFERENCE_COLUMN_ID, typeAffinity = ColumnInfo.INTEGER)
     private long userId;
 
+    @ColumnInfo (name = Message.REFERENCE_COLUMN_ID, typeAffinity = ColumnInfo.INTEGER)
+    private long messageId;
+
     @ColumnInfo(name = COLUMN_TITLE, typeAffinity = ColumnInfo.TEXT)
     private String title;
 
@@ -55,11 +67,17 @@ public class Page implements Parcelable
      * @param title     the title of the page
      * @param order
      */
-    public Page (long id, long userId, @NonNull String title, int order) {
+    public Page (long id, long userId, long messageId, @NonNull String title, int order) {
         this.id = id;
         this.userId = userId;
+        this.messageId = messageId;
         this.title = title;
         this.order = order;
+    }
+
+    @Ignore
+    public Page (long userId, long messageId, @NonNull String title) {
+        this (0, userId, messageId, title, 0);
     }
 
     public long getId() {
@@ -76,6 +94,14 @@ public class Page implements Parcelable
 
     public void setUserId(long userId) {
         this.userId = userId;
+    }
+
+    public long getMessageId() {
+        return messageId;
+    }
+
+    public void setMessageId(long messageId) {
+        this.messageId = messageId;
     }
 
     public String getTitle() {

@@ -1,5 +1,8 @@
 package com.elan_droid.elandroid.database.relation;
 
+import com.elan_droid.elandroid.database.entity.User;
+import com.elan_droid.elandroid.database.entity.Vehicle;
+
 /**
  * Created by Peter Smith
  */

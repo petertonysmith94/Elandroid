@@ -9,5 +9,8 @@
     android:padding="@dimen/dialog_padding"
     android:weightSum="1">
 
+    <com.elan_droid.elandroid.ui.widget.AnalogDialWidget
+        android:layout_width="300dp"
+        android:layout_height="300dp" />
 
 </FrameLayout>

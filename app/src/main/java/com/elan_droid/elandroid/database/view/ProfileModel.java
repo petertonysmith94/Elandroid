@@ -172,50 +172,7 @@ public class ProfileModel extends AndroidViewModel {
         }
     }
 
-    public void updateProfile(Profile profile, boolean active, UpdateProfileCallback callback){
-        new UpdateAsyncTask(this.getApplication(), mDatabase, callback).execute(profile);
-    }
 
-    public interface UpdateProfileCallback {
-
-        void onProfileUpdated (boolean success);
-
-    }
-
-    /**
-     * Task for populating the database with a new profile
-     */
-    private static class UpdateAsyncTask extends AsyncTask<Profile, Void, Boolean> {
-
-        private Context mmContext;
-        private AppDatabase mmDatabase;
-        private UpdateProfileCallback mmCallback;
-
-        UpdateAsyncTask (Context context, AppDatabase database, UpdateProfileCallback callback) {
-            mmContext = context;
-            mmDatabase = database;
-            mmCallback = callback;
-        }
-
-        @SuppressWarnings("We should commit because it's already an Async task ")
-        @Override
-        protected Boolean doInBackground(Profile... params) {
-            User vehicle;
-
-            if(params.length > 0 && params[0] != null && (vehicle = params[0].getUser()) != null) {
-                mmDatabase.userVehicleDao().update(vehicle);
-                return true;
-            }
-            return false;
-        }
-
-        @Override
-        protected void onPostExecute(Boolean success) {
-            if (mmCallback != null) {
-                mmCallback.onProfileUpdated(success);
-            }
-        }
-    }
 
 
     /**

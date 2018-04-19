@@ -14,7 +14,7 @@ import java.util.List;
  * Created by Peter Smith
  */
 @Dao
-public abstract class VehicleDao extends BaseDao<Vehicle> {
+public abstract class VehicleDao implements BaseDao<Vehicle> {
 
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
