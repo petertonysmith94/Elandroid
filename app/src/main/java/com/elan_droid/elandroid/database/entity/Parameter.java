@@ -7,6 +7,7 @@ import android.arch.persistence.room.TypeConverters;
 
 import com.elan_droid.elandroid.database.converter.ParameterType;
 import com.elan_droid.elandroid.ui.widget.DisplayType;
+import com.elan_droid.elandroid.ui.widget.Widget;
 
 /**
  * Created by Peter Smith
@@ -84,7 +85,7 @@ public abstract class Parameter {
         this.type = type;
     }
 
-    public abstract DisplayType[] getDisplays();
+    public abstract Widget.Type[] getWidgetTypes();
 
     @Override
     public String toString() {
@@ -139,8 +140,8 @@ public abstract class Parameter {
         BITWISE_8 (Type.BITWISE_VALUE),
         FORMATTED (Type.FORMATTED_VALUE);
 
-        private static final int BITWISE_VALUE = 1;
-        private static final int FORMATTED_VALUE = 2;
+        public static final int BITWISE_VALUE = 1;
+        public static final int FORMATTED_VALUE = 2;
 
         private int value;
 

@@ -1,7 +1,5 @@
 package com.elan_droid.elandroid.ui.generic;
 
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -24,8 +22,6 @@ import android.widget.TextView;
 import com.elan_droid.elandroid.R;
 import com.elan_droid.elandroid.adapter.ProfileAdapter;
 import com.elan_droid.elandroid.database.relation.Profile;
-import com.elan_droid.elandroid.database.view.ActiveProfile;
-import com.elan_droid.elandroid.database.view.ProfileModel;
 import com.elan_droid.elandroid.ui.dashboard.DashboardFragment;
 import com.elan_droid.elandroid.ui.profile.ProfileActivity;
 import com.elan_droid.elandroid.ui.dialog.ProfileSelectDialog;
@@ -43,9 +39,6 @@ public abstract class NavigationActivity extends BaseActivity implements
     private static final String PROFILE_ID = "com.elan_droid.elandroid.ui.generic.PROFILE_ID";
 
     public static final String TAG = "NavigationActivity";
-
-    private ActiveProfile mActiveProfile;
-    private ProfileModel mProfileModel;
 
     // The main navigation UI elements
     protected NavigationView mNavView;
@@ -66,10 +59,6 @@ public abstract class NavigationActivity extends BaseActivity implements
         setContentView(R.layout.activity_navigation);
 
         Log.d(TAG, "onCreate(savedInstanceState) called");
-
-        mActiveProfile = ViewModelProviders.of(this).get(ActiveProfile.class);
-
-        mProfileModel = ViewModelProviders.of(this).get(ProfileModel.class);
 
 
         Toolbar toolbar = initToolbar();
@@ -107,39 +96,27 @@ public abstract class NavigationActivity extends BaseActivity implements
         mMakeModel = (TextView) header.findViewById(R.id.nav_profile_make_model);
         mRegistration = (TextView) header.findViewById(R.id.nav_profile_registration);
 
-        mActiveProfile.getActiveProfile().observe(this, new Observer<Profile>() {
-            @Override
-            public void onChanged(@Nullable Profile profile) {
-                if (profile != null) {
-                    mNameText.setText(profile.getName());
-                    mMakeModel.setText(profile.getMakeModel());
-                    mRegistration.setText(profile.getRegistration());
-                    transitionFragmentWithFallback(false);
-                }
-                else {
-                    forceNewProfile();
-                }
-            }
-        });
-
-
         if (savedInstanceState == null) {
-            mProfileId = mProfileModel.getActiveProfileId();
             transitionFragmentWithFallback(R.id.nav_dashboard, true);
         }
         else {
             mNavView.setCheckedItem(mSelectedNavItemId);
         }
 
-
-
-
-        //supportInvalidateOptionsMenu();
-
-        //setSupportActionBar(toolbar);
-        //mDrawerToggle.syncState();
     }
 
+    @Override
+    public void onChanged(@Nullable Profile profile) {
+        super.onChanged(profile);
+
+        if (profile != null) {
+            updateHeader(profile);
+            transitionFragmentWithFallback(false);
+        }
+        else {
+            forceNewProfile();
+        }
+    }
 
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
@@ -159,23 +136,11 @@ public abstract class NavigationActivity extends BaseActivity implements
     protected void onResume() {
         super.onResume();
 
-        // Retrives the current active profile
-        mProfileModel.fetchActiveProfile(new ProfileModel.FetchProfileCallback() {
-            @Override
-            public void onProfileFetched(Profile profile) {
-                if (profile != null) {
-                    updateHeader(profile);
-                }
-                else {
-                    forceNewProfile();
-                }
-            }
-        });
     }
 
     @Override
     public void onProfileSelected(Profile profile) {
-        mActiveProfile.setActiveProfile(profile);
+        getProfileModel().setActiveProfile(profile);
     }
 
     /**
@@ -194,17 +159,11 @@ public abstract class NavigationActivity extends BaseActivity implements
         mNavDrawer.closeDrawer(GravityCompat.START);
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
     @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         return transitionFragment(item);
     }
 
-    private void forceNewProfile () {
-        Intent intent = ProfileActivity.getIntent(this, ProfileActivity.ACTION_FORCE);
-        startActivity(intent);
-        finish();
-    }
 
     private boolean transitionFragmentWithFallback(boolean closeDrawer) {
         boolean result = transitionFragmentWithFallback(mSelectedNavItemId, closeDrawer);
@@ -234,7 +193,7 @@ public abstract class NavigationActivity extends BaseActivity implements
 
     private boolean transitionFragment(MenuItem item, boolean closeDrawer) {
         // If no current active profile set then force a new one
-        if (mActiveProfile == null) {
+        if (getActiveProfileId() == 0) {
             return false;
         }
 

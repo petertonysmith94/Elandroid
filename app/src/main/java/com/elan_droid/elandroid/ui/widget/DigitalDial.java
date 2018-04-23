@@ -2,12 +2,13 @@ package com.elan_droid.elandroid.ui.widget;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.view.View;
 
 /**
  * Created by Peter Smith
  */
 
-public class DigitalDial extends BaseWidget {
+public class DigitalDial extends Widget {
 
     private static final int ID = 2;
     private static final String NAME = "Digital dial";
@@ -31,6 +32,11 @@ public class DigitalDial extends BaseWidget {
         @Override
         public DisplaySize[] getSizes() {
             return SIZES;
+        }
+
+        @Override
+        public View createView(Context context) {
+            return new DigitalDial(context, null);
         }
 
         @Override

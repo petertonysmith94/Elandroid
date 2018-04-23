@@ -1,5 +1,8 @@
 package com.elan_droid.elandroid.ui.widget;
 
+import android.content.Context;
+import android.view.View;
+
 /**
  * Created by Peter Smith
  */
@@ -11,5 +14,7 @@ public interface DisplayType {
     String getName();
 
     DisplaySize[] getSizes();
+
+    View createView (Context context);
 
 }

@@ -3,7 +3,7 @@ package com.elan_droid.elandroid.database.dao;
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Transaction;
 
-import com.elan_droid.elandroid.database.entity.FormattedParameter;
+import com.elan_droid.elandroid.database.entity.ParameterFormatted;
 import com.elan_droid.elandroid.database.entity.Parameter;
 import com.elan_droid.elandroid.database.entity.ParameterBitwise8;
 
@@ -29,7 +29,7 @@ public abstract class ParameterDao implements ParameterFormattedDao, ParameterBi
         for (Parameter p : parameters) {
             switch (p.getType()) {
                 case FORMATTED:
-                    insertFormatted( (FormattedParameter) p);
+                    insertFormatted( (ParameterFormatted) p);
                     break;
 
                 case BITWISE_8:

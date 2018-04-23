@@ -1,5 +1,6 @@
 package com.elan_droid.elandroid.database.dao;
 
+import android.arch.lifecycle.LiveData;
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Query;
 
@@ -22,14 +23,28 @@ public abstract class PageDao implements BaseDao<Page> {
     public abstract List<Page> getPages (long userId);
 
     @Query("SELECT *" +
+            " FROM " + Page.TABLE_NAME +
+            " WHERE " + User.REFERENCE_COLUMN_ID + " = :userId")
+    public abstract LiveData<List<Page>> getLivePages (long userId);
+
+    @Query("SELECT *" +
             " FROM " + PageItem.TABLE_NAME +
             " WHERE " + Page.REFERENCE_COLUMN_ID + " = :pageId")
     public abstract List<PageItem> getPageItems (long pageId);
+
+    @Query("SELECT *" +
+            " FROM " + PageItem.TABLE_NAME +
+            " WHERE " + Page.REFERENCE_COLUMN_ID + " = :pageId")
+    public abstract LiveData<List<PageItem>> getLivePageItems (long pageId);
 
     @Query("SELECT *" +
             " FROM " + Page.TABLE_NAME +
             " WHERE " + User.REFERENCE_COLUMN_ID + " = :userId")
     public abstract List<DetailedPage> getDetailedPages (long userId);
 
+    @Query("SELECT *" +
+            " FROM " + Page.TABLE_NAME +
+            " WHERE " + User.REFERENCE_COLUMN_ID + " = :userId")
+    public abstract LiveData<List<DetailedPage>> getLiveDetailedPages (long userId);
 
 }

@@ -4,21 +4,23 @@ import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.Ignore;
+import android.view.View;
+import android.widget.TextView;
 
-import com.elan_droid.elandroid.ui.widget.AnalogDialWidget;
-import com.elan_droid.elandroid.ui.widget.DigitalDial;
-import com.elan_droid.elandroid.ui.widget.DisplayType;
+import com.elan_droid.elandroid.R;
+import com.elan_droid.elandroid.ui.page.PacketListPage;
+import com.elan_droid.elandroid.ui.widget.Widget;
 
 import static android.arch.persistence.room.ForeignKey.CASCADE;
 
 /**
  * Created by Peter Smith
  *
- * A FormattedParameter represents a data item on the stream which can be converted into
+ * A ParameterFormatted represents a data item on the stream which can be converted into
  * a real value.
  */
 @Entity (
-    tableName = FormattedParameter.TABLE_NAME,
+    tableName = ParameterFormatted.TABLE_NAME,
     foreignKeys = {
         @ForeignKey (
             entity = Message.class,
@@ -29,11 +31,11 @@ import static android.arch.persistence.room.ForeignKey.CASCADE;
         )
     }
 )
-public class FormattedParameter extends StreamParameter {
+public class ParameterFormatted extends ParameterStream {
 
-    private static final DisplayType[] DISPLAY_WIDGET = {
-        AnalogDialWidget.DISPLAY,
-        DigitalDial.DISPLAY
+    private static final Widget.Type[] DISPLAY_WIDGET = {
+        Widget.Type.ANALOG_DIAL,
+        Widget.Type.DIGITAL_DIAL
     };
 
     public final static String TABLE_NAME = "formatted_parameter";
@@ -79,7 +81,7 @@ public class FormattedParameter extends StreamParameter {
      * @param units
      * @param signed
      */
-    public FormattedParameter(long id, long messageId, String identifier, String name, Type type, int position, int length,
+    public ParameterFormatted(long id, long messageId, String identifier, String name, Type type, int position, int length,
                               double multiplier, double offset, String format, String units, int signed) {
         super(id, messageId, identifier, name, type, position, length);
 
@@ -104,13 +106,13 @@ public class FormattedParameter extends StreamParameter {
      * @param signed
      */
     @Ignore
-    public FormattedParameter (long messageId, String identifier, String name, int position, int length,
-                               double multiplier, double offset, String format, String units, boolean signed) {
+    public ParameterFormatted(long messageId, String identifier, String name, int position, int length,
+                              double multiplier, double offset, String format, String units, boolean signed) {
         this (0, messageId, identifier, name, Type.FORMATTED, position, length, multiplier, offset, format, units, signed ? 1 : 0);
     }
 
     @Override
-    public DisplayType[] getDisplays() {
+    public Widget.Type[] getWidgetTypes() {
         return DISPLAY_WIDGET;
     }
 
@@ -158,6 +160,28 @@ public class FormattedParameter extends StreamParameter {
 
     public void setSigned(int signed) {
         this.signed = signed;
+    }
+
+    public static class ListViewHolder extends PacketListPage.ParameterAdapter.BaseViewHolder {
+
+        TextView paramName;
+        TextView packetValue;
+        TextView paramUnits;
+
+        public ListViewHolder(View view) {
+            super(view);
+
+            paramName = (TextView) view.findViewById(R.id.list_item_formatted_parameter_title);
+            packetValue = (TextView) view.findViewById(R.id.list_item_formatted_packet_value);
+            paramUnits = (TextView) view.findViewById(R.id.list_item_formatted_parameter_units);
+        }
+
+        public void bind (Parameter parameter, View.OnClickListener listener) {
+            final ParameterFormatted formatted = (ParameterFormatted) parameter;
+            paramName.setText(formatted.getName());
+            packetValue.setText("--");
+            paramUnits.setText(formatted.getUnits());
+        }
     }
 
 }

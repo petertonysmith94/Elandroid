@@ -10,12 +10,13 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Page name"
-        android:labelFor="@+id/dialog_dashboard_add_page_name"/>
+        android:text="Trip name"
+        android:labelFor="@+id/dialog_save_trip_name"/>
 
     <EditText
-        android:id="@+id/dialog_dashboard_add_page_name"
+        android:id="@+id/dialog_save_trip_name"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:hint="E.g. Silverstone 07/18"/>
 
 </LinearLayout>

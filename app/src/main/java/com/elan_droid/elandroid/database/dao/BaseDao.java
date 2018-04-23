@@ -7,18 +7,18 @@ import android.arch.persistence.room.Insert;
  * Created by Peter Smith
  */
 
-interface BaseDao<T> {
+public interface BaseDao<T> {
 
     @Insert
-    public abstract long insert (T element);
+    long insert (T element);
 
     @Insert
-    public abstract void insertAll (T... elements);
+    void insertAll (T... elements);
 
     @Delete
-    public abstract void delete (T element);
+    void delete (T element);
 
     @Delete
-    public abstract void delete (T... elements);
+    void delete (T... elements);
 
 }

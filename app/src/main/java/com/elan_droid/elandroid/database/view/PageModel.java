@@ -1,7 +1,10 @@
 package com.elan_droid.elandroid.database.view;
 
 import android.app.Application;
+import android.arch.core.util.Function;
+import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
+import android.arch.lifecycle.Transformations;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 
@@ -21,6 +24,7 @@ public class PageModel extends PageItemModel {
     private AppDatabase mDatabase;
 
     private MutableLiveData<List<DetailedPage>> mPages;
+
     private long mUserId;
 
     public PageModel(@NonNull Application application) {
@@ -127,22 +131,23 @@ public class PageModel extends PageItemModel {
 
         @Override
         protected PageItem doInBackground(PageItem... params) {
+            PageItem result = null;
+
             if(params.length > 0) {
-                final PageItem item = params[0];
-                final long id = mmDatabase.pageItemDao().insert(item);
+                result = params[0];
+                final long id = mmDatabase.pageItemDao().insert(result);
 
                 if (id != 0) {
-                    item.setId(id);
-                    return item;
+                    result.setId(id);
                 }
             }
-            return null;
+            return result;
         }
 
         @Override
-        protected void onPostExecute(PageItem page) {
+        protected void onPostExecute(PageItem item) {
             if (mmCallback != null) {
-                //mmCallback.onCreate(new DetailedPage(page));
+                mmCallback.onCreate(item);
             }
         }
     }
@@ -228,8 +233,6 @@ public class PageModel extends PageItemModel {
         }
 
     }
-
-
 
 
 

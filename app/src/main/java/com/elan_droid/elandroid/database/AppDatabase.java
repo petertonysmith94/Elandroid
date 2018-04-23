@@ -9,6 +9,7 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 
 import com.elan_droid.elandroid.database.dao.MessageDao;
+import com.elan_droid.elandroid.database.dao.PacketDao;
 import com.elan_droid.elandroid.database.dao.PageDao;
 import com.elan_droid.elandroid.database.dao.PageItemDao;
 import com.elan_droid.elandroid.database.dao.ParameterDao;
@@ -16,11 +17,11 @@ import com.elan_droid.elandroid.database.dao.ProfileDao;
 import com.elan_droid.elandroid.database.dao.TripDao;
 import com.elan_droid.elandroid.database.dao.UserDao;
 import com.elan_droid.elandroid.database.dao.VehicleDao;
-import com.elan_droid.elandroid.database.entity.FormattedParameter;
+import com.elan_droid.elandroid.database.entity.Packet;
+import com.elan_droid.elandroid.database.entity.ParameterFormatted;
 import com.elan_droid.elandroid.database.entity.Message;
 import com.elan_droid.elandroid.database.entity.Page;
 import com.elan_droid.elandroid.database.entity.PageItem;
-import com.elan_droid.elandroid.database.entity.Parameter;
 import com.elan_droid.elandroid.database.entity.ParameterBitwise8;
 import com.elan_droid.elandroid.database.entity.Trip;
 import com.elan_droid.elandroid.database.entity.User;
@@ -29,7 +30,6 @@ import com.elan_droid.elandroid.database.model.LotusElanS2;
 import com.elan_droid.elandroid.database.model.PrepopulateModel;
 import com.elan_droid.elandroid.database.relation.Command;
 
-import java.util.List;
 import java.util.concurrent.Executors;
 
 /**
@@ -40,7 +40,7 @@ import java.util.concurrent.Executors;
     exportSchema = false,
     entities = {
         Vehicle.class, User.class, Message.class, Page.class, PageItem.class,
-            Trip.class, ParameterBitwise8.class, FormattedParameter.class
+            Trip.class, ParameterBitwise8.class, ParameterFormatted.class, Packet.class
     }
 )
 public abstract class AppDatabase extends RoomDatabase {
@@ -103,6 +103,8 @@ public abstract class AppDatabase extends RoomDatabase {
     public abstract PageDao pageDao();
 
     public abstract TripDao tripDao();
+
+    public abstract PacketDao packetDao();
 
     public abstract ParameterDao parameterDao();
 

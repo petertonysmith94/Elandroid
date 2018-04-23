@@ -78,10 +78,19 @@ public class DashboardFragment extends BaseFragment implements View.OnClickListe
         mPageAdapter = new PageAdapter(getActivity().getSupportFragmentManager());
 
         mPageModel = ViewModelProviders.of(getActivity()).get(PageModel.class);
+
+
+        getActivity().setTitle("Dashboard");
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
         mPageModel.getPages().observe(this, new Observer<List<DetailedPage>>() {
             @Override
             public void onChanged(@Nullable List<DetailedPage> detailedPages) {
-                mPager.removeAllViews();
+                //mPager.removeAllViews();
                 mPageAdapter.updatePages(detailedPages);
             }
         });
@@ -94,8 +103,6 @@ public class DashboardFragment extends BaseFragment implements View.OnClickListe
                 }
             }
         });
-
-        getActivity().setTitle("Dashboard");
     }
 
     @Override

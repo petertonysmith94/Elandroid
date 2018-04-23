@@ -5,9 +5,11 @@ import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.TypeConverters;
+import android.view.View;
 
 import com.elan_droid.elandroid.database.converter.StringArrayConverter;
-import com.elan_droid.elandroid.ui.widget.DisplayType;
+import com.elan_droid.elandroid.ui.page.PacketListPage;
+import com.elan_droid.elandroid.ui.widget.Widget;
 
 import static android.arch.persistence.room.ForeignKey.CASCADE;
 
@@ -26,9 +28,9 @@ import static android.arch.persistence.room.ForeignKey.CASCADE;
         )
     }
 )
-public class ParameterBitwise8 extends StreamParameter {
+public class ParameterBitwise8 extends ParameterStream {
 
-    private static final DisplayType[] DISPLAY_WIDGET = {
+    private static final Widget.Type[] DISPLAY_WIDGET = {
 
     };
 
@@ -79,7 +81,7 @@ public class ParameterBitwise8 extends StreamParameter {
     }
 
     @Override
-    public DisplayType[] getDisplays() {
+    public Widget.Type[] getWidgetTypes() {
         return DISPLAY_WIDGET;
     }
 
@@ -95,4 +97,19 @@ public class ParameterBitwise8 extends StreamParameter {
     public void setDescriptions(String[] descriptions) {
         this.descriptions = descriptions;
     }
+
+
+    public static class ListViewHolder extends PacketListPage.ParameterAdapter.BaseViewHolder {
+
+        public ListViewHolder(View itemView) {
+            super(itemView);
+        }
+
+        public void bind (Parameter parameter, View.OnClickListener listener) {
+            final ParameterBitwise8 bitwise = (ParameterBitwise8) parameter;
+
+        }
+    }
+
+
 }

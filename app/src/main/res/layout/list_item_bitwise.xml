@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="@dimen/list_item_padding">
+
+    <TextView
+        android:id="@+id/list_item_bitwise_parameter_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="parameter title"
+        android:layout_weight="1"
+        android:layout_margin="8dp"/>
+
+    <ImageButton
+        android:id="@+id/list_item_bitwise_dropdown_arrow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@android:drawable/arrow_down_float"
+        android:layout_gravity="right"/>
+
+</LinearLayout>

@@ -28,6 +28,11 @@
         <activity
             android:name=".ui.profile.ProfileActivity"
             android:theme="@style/AppTheme"/>
+
+        <service
+            android:name=".service.BaseService"
+            android:label="Base service">
+        </service>
     </application>
 
 </manifest>

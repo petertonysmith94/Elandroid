@@ -6,12 +6,16 @@ import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
+import android.arch.persistence.room.TypeConverters;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
+import com.elan_droid.elandroid.database.converter.ParameterType;
+import com.elan_droid.elandroid.database.converter.WidgetTypeConverter;
 import com.elan_droid.elandroid.database.embedded.Position;
 import com.elan_droid.elandroid.database.embedded.Size;
+import com.elan_droid.elandroid.ui.widget.Widget;
 
 import static android.arch.persistence.room.ForeignKey.CASCADE;
 
@@ -29,7 +33,7 @@ import static android.arch.persistence.room.ForeignKey.CASCADE;
             onUpdate = CASCADE
         ),
         @ForeignKey (
-            entity = FormattedParameter.class,
+            entity = ParameterFormatted.class,
             parentColumns = Parameter.COLUMN_ID,
             childColumns = Parameter.REFERENCE_COLUMN_ID,
             onDelete = CASCADE,
@@ -45,7 +49,7 @@ public class PageItem implements Parcelable {
     public final static String REFERENCE_COLUMN_ID = "page_item_id";
     public final static String COLUMN_ID = "pageItemId";
     public final static String COLUMN_NAME = "name";
-
+    public final static String COLUMN_WIDGET_TYPE = "widget_type";
 
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = COLUMN_ID, typeAffinity = ColumnInfo.INTEGER)
@@ -61,6 +65,10 @@ public class PageItem implements Parcelable {
     @ColumnInfo(name = COLUMN_NAME, typeAffinity = ColumnInfo.TEXT)
     private String name;
 
+    @ColumnInfo (name = COLUMN_WIDGET_TYPE)
+    @TypeConverters(value = WidgetTypeConverter.class)
+    private Widget.Type type;
+
     @NonNull
     @Embedded
     private Position position;
@@ -69,16 +77,21 @@ public class PageItem implements Parcelable {
     @Embedded
     private Size size;
 
+
+
     @Ignore
-    public PageItem (long pageId, long parameterId, @NonNull String name, Position position, Size size) {
-        this (0, pageId, parameterId, name, position, size);
+    public PageItem (long pageId, long parameterId, @NonNull String name,
+                     @NonNull Widget.Type type, Position position, Size size) {
+        this (0, pageId, parameterId, name, type, position, size);
     }
 
-    public PageItem (long id, long pageId, long parameterId, @NonNull String name, Position position, Size size) {
+    public PageItem (long id, long pageId, long parameterId, @NonNull String name,
+                     @NonNull Widget.Type type, Position position, Size size) {
         this.id = id;
         this.pageId = pageId;
         this.parameterId = parameterId;
         this.name = name;
+        this.type = type;
         this.position = position;
         this.size = size;
     }
@@ -114,6 +127,14 @@ public class PageItem implements Parcelable {
 
     public void setName(@NonNull String name) {
         this.name = name;
+    }
+
+    public Widget.Type getType() {
+        return type;
+    }
+
+    public void setType(Widget.Type type) {
+        this.type = type;
     }
 
     public Position getPosition() {

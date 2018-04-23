@@ -25,6 +25,7 @@ import com.elan_droid.elandroid.database.entity.Parameter;
 import com.elan_droid.elandroid.database.view.ParameterModel;
 import com.elan_droid.elandroid.ui.widget.DisplaySize;
 import com.elan_droid.elandroid.ui.widget.DisplayType;
+import com.elan_droid.elandroid.ui.widget.Widget;
 
 import java.util.List;
 import java.util.Random;
@@ -47,7 +48,7 @@ public class PageItemDialog extends DialogFragment implements DialogInterface.On
     private ArrayAdapter<Parameter> mParameterAdapter;
 
     private Spinner mTypeSpinner;
-    private ArrayAdapter<DisplayType> mTypeAdapter;
+    private ArrayAdapter<Widget.Type> mTypeAdapter;
 
     private Spinner mSizeSpinner;
     private ArrayAdapter<DisplaySize> mSizeAdapter;
@@ -121,8 +122,7 @@ public class PageItemDialog extends DialogFragment implements DialogInterface.On
                 mName.setText(parameter.getName());
 
                 mTypeAdapter.clear();
-                mTypeAdapter.addAll(parameter.getDisplays());
-
+                mTypeAdapter.addAll(parameter.getWidgetTypes());
             }
 
             @Override
@@ -134,10 +134,10 @@ public class PageItemDialog extends DialogFragment implements DialogInterface.On
         mTypeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
-                DisplayType type = mTypeAdapter.getItem(position);
+                Widget.Type type = mTypeAdapter.getItem(position);
 
                 mSizeAdapter.clear();
-                mSizeAdapter.addAll(type.getSizes());
+                mSizeAdapter.addAll(type.getDisplay().getSizes());
             }
 
             @Override
@@ -183,11 +183,13 @@ public class PageItemDialog extends DialogFragment implements DialogInterface.On
             error = true;
         }
 
+        Widget.Type type = mTypeAdapter.getItem(mTypeSpinner.getSelectedItemPosition());
+
         Parameter parameter = (Parameter) mParameterSpinner.getSelectedItem();
 
         Size size = new Size(mSizeAdapter.getItem(mSizeSpinner.getSelectedItemPosition()));
 
-        return error ? null : new PageItem(mPage.getId(), parameter.getId(), name, new Position(0, 0), size);
+        return error ? null : new PageItem(mPage.getId(), parameter.getId(), name, type, new Position(0, 0), size);
     }
 
     @Override

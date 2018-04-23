@@ -1,5 +1,7 @@
 package com.elan_droid.elandroid.ui.dashboard;
 
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -20,6 +22,8 @@ import com.elan_droid.elandroid.database.entity.PageItem;
 import com.elan_droid.elandroid.database.embedded.Position;
 import com.elan_droid.elandroid.database.embedded.Size;
 import com.elan_droid.elandroid.database.relation.DetailedPage;
+import com.elan_droid.elandroid.database.view.PageItemModel;
+import com.elan_droid.elandroid.database.view.PageModel;
 
 import java.util.List;
 
@@ -28,6 +32,8 @@ import java.util.List;
  */
 
 public class BaseDashboardPage extends Fragment implements View.OnTouchListener, View.OnLongClickListener {
+
+    private PageItemModel itemModel;
 
     private DetailedPage mPage;
 
@@ -44,6 +50,8 @@ public class BaseDashboardPage extends Fragment implements View.OnTouchListener,
         return fragment;
     }
 
+
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,6 +59,23 @@ public class BaseDashboardPage extends Fragment implements View.OnTouchListener,
         if (!handleBundle(savedInstanceState)) {
             handleBundle(getArguments());
         }
+
+        itemModel = ViewModelProviders.of(getActivity()).get(PageItemModel.class);
+        updatePage(mPage);
+    }
+
+    public void updatePage (DetailedPage page) {
+        this.mPage = page;
+        addObserver(mPage.getPage().getId());
+    }
+
+    public void addObserver (long pageId) {
+        itemModel.getItems(pageId).observe(getActivity(), new Observer<List<PageItem>>() {
+            @Override
+            public void onChanged(@Nullable List<PageItem> pageItems) {
+                updateItems(pageItems);
+            }
+        });
     }
 
     @Nullable
@@ -59,36 +84,34 @@ public class BaseDashboardPage extends Fragment implements View.OnTouchListener,
         View view = inflater.inflate(R.layout.dashboard_relative_page, container, false);
 
         mLayout = (FrameLayout) view.findViewById(R.id.dashboard_page_root);
-        mLayout.removeAllViews();
+        //mLayout.removeAllViews();
 
-        parseItems(mPage.getItems());
+        createItems(mLayout, mPage.getItems());
 
         return view;
     }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
+    private void createItems (FrameLayout container, List<PageItem> items) {
+        if (container != null && items != null) {
+            final Context context = container.getContext();
+            FrameLayout.LayoutParams params;
 
-        for (PageItem item : mPage.getItems()) {
-            View view = mLayout.findViewWithTag(item);
+            for (PageItem item : items) {
+                Button button = new Button(context);
 
-            if (view != null) {
-                mLayout.removeView(view);
+                button.setTag(item);
+                button.setText(item.getName());
+
+                item.getType().getDisplay().createView(context);
+
+                params = parseSize(item.getSize());
+                parsePosition(params, item.getPosition());
             }
+
         }
     }
 
-    public boolean handleBundle(final Bundle bundle) {
-        final boolean condition = (bundle != null);
-
-        if (condition) {
-            mPage = bundle.getParcelable(DetailedPage.EXTRA);
-        }
-        return condition;
-    }
-
-    public void parseItems (List<PageItem> items) {
+    public void updateItems (List<PageItem> items) {
         if (items != null && items.size() > 0) {
             FrameLayout.LayoutParams params;
             Context context = mLayout.getContext();
@@ -108,6 +131,45 @@ public class BaseDashboardPage extends Fragment implements View.OnTouchListener,
                 mLayout.addView(view, params);
             }
         }
+    }
+
+
+
+    private void destroyItems (ViewGroup container, final List<PageItem> items) {
+        if (container != null && items != null) {
+            View v;
+
+            for (PageItem item : items) {
+                v = container.findViewWithTag(item);
+
+                if (v != null)
+                    container.removeView(v);
+            }
+        }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+
+        if (mPage != null) {
+            for (PageItem item : mPage.getItems()) {
+                View view = mLayout.findViewWithTag(item);
+
+                if (view != null) {
+                    mLayout.removeView(view);
+                }
+            }
+        }
+    }
+
+    public boolean handleBundle(final Bundle bundle) {
+        final boolean condition = (bundle != null);
+
+        if (condition) {
+            mPage = bundle.getParcelable(DetailedPage.EXTRA);
+        }
+        return condition;
     }
 
 
@@ -161,6 +223,7 @@ public class BaseDashboardPage extends Fragment implements View.OnTouchListener,
                 position.setX(params.leftMargin);
                 position.setY(params.topMargin);
 
+                itemModel.update(item, null);
                 mPage.setItemPosition(item, position);
 
                 //v.setOnTouchListener(null);

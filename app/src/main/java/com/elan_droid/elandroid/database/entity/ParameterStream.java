@@ -8,7 +8,7 @@ import android.arch.persistence.room.ColumnInfo;
  * A stream parameter represents a parameter which originates from a data stream.
  * Therefore it can be formatted into a value from a byte array
  */
-public abstract class StreamParameter extends Parameter {
+public abstract class ParameterStream extends Parameter {
 
     public final static String COLUMN_STREAM_POSITION = "position";
     public final static String COLUMN_STREAM_LENGTH = "length";
@@ -29,8 +29,8 @@ public abstract class StreamParameter extends Parameter {
      * @param position
      * @param length
      */
-    public StreamParameter (long id, long messageId, String identifier, String name, Type type,
-                            int position, int length) {
+    public ParameterStream(long id, long messageId, String identifier, String name, Type type,
+                           int position, int length) {
         super (id, messageId, identifier, name, type);
 
         this.position = position;

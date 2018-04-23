@@ -5,13 +5,12 @@ import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.util.AttributeSet;
+import android.view.View;
 
 import com.elan_droid.elandroid.R;
 
@@ -19,7 +18,7 @@ import com.elan_droid.elandroid.R;
  * Created by Peter Smith
  */
 
-public class AnalogDialWidget extends BaseWidget {
+public class AnalogDialWidget extends Widget {
 
     private static final int ID = 1;
     private static final String NAME = "Radial dial";
@@ -43,6 +42,11 @@ public class AnalogDialWidget extends BaseWidget {
         @Override
         public DisplaySize[] getSizes() {
             return SIZES;
+        }
+
+        @Override
+        public View createView (Context context) {
+            return new AnalogDialWidget(context, null);
         }
 
         @Override

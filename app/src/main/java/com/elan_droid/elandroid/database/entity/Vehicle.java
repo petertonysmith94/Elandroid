@@ -14,7 +14,7 @@ import java.util.List;
  * Created by Peter Smith
  */
 @Entity(
-tableName = Vehicle.TABLE_NAME,
+    tableName = Vehicle.TABLE_NAME,
     indices = {
         @Index (
             value = { Vehicle.COLUMN_MAKE, Vehicle.COLUMN_MODEL },
