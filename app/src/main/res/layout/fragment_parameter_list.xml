@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_height="match_parent"
     android:layout_width="match_parent">
@@ -11,10 +12,12 @@
         android:tag="ACTIVE_TRIP_DEBUG"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        class="com.elan_droid.elandroid.ui.debug.ActiveTripDebug" />
+        class="com.elan_droid.elandroid.ui.debug.ActiveTripDebug"
+        tools:layout="@layout/fragment_active_trip_debug" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/parameter_list"
+        android:scrollbars="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 

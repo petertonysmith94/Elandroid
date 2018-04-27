@@ -22,13 +22,11 @@ import com.elan_droid.elandroid.database.entity.PageItem;
 import com.elan_droid.elandroid.database.embedded.Position;
 import com.elan_droid.elandroid.database.embedded.Size;
 import com.elan_droid.elandroid.database.entity.Parameter;
-import com.elan_droid.elandroid.database.view.ParameterModel;
+import com.elan_droid.elandroid.database.view_model.ParameterModel;
 import com.elan_droid.elandroid.ui.widget.DisplaySize;
-import com.elan_droid.elandroid.ui.widget.DisplayType;
 import com.elan_droid.elandroid.ui.widget.Widget;
 
 import java.util.List;
-import java.util.Random;
 
 import static android.app.Activity.RESULT_OK;
 

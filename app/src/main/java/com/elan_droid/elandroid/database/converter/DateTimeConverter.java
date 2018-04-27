@@ -5,9 +5,10 @@ import android.arch.persistence.room.TypeConverter;
 import java.util.Date;
 
 /**
- * Created by BorisJohnson on 4/19/2018.
+ * Created by Peter Smith on 4/19/2018.
+ *
+ * Converts the Date into a Long value and vice-versa
  */
-
 public class DateTimeConverter {
 
     @TypeConverter

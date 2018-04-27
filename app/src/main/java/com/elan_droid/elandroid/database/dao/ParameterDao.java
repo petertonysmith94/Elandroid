@@ -17,7 +17,7 @@ import java.util.List;
 public abstract class ParameterDao implements ParameterFormattedDao, ParameterBitwise8Dao {
 
     @Transaction
-    public List<Parameter> fetch (long messageId) {
+    public List<Parameter> fetchParameters (long messageId) {
         List<Parameter> parameters = new ArrayList<>();
         //parameters.addAll(fetchBitwise(messageId));
         parameters.addAll(fetchFormatted(messageId));

@@ -1,6 +1,5 @@
 package com.elan_droid.elandroid.ui.profile;
 
-import android.app.ActionBar;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
@@ -23,9 +22,8 @@ import android.widget.Toast;
 
 import com.elan_droid.elandroid.R;
 import com.elan_droid.elandroid.database.relation.Profile;
-import com.elan_droid.elandroid.database.view.ActiveProfile;
-import com.elan_droid.elandroid.database.view.ProfileModel;
-import com.elan_droid.elandroid.database.view.VehicleModel;
+import com.elan_droid.elandroid.database.view_model.ActiveProfile;
+import com.elan_droid.elandroid.database.view_model.VehicleModel;
 import com.elan_droid.elandroid.ui.generic.MainActivity;
 
 import java.util.ArrayList;

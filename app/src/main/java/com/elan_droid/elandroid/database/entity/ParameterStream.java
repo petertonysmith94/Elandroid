@@ -2,11 +2,15 @@ package com.elan_droid.elandroid.database.entity;
 
 import android.arch.persistence.room.ColumnInfo;
 
+import java.util.Arrays;
+
 /**
  * Created by Peter Smith
  *
  * A stream parameter represents a parameter which originates from a data stream.
- * Therefore it can be formatted into a value from a byte array
+ * Therefore it can be formatted into a value from a byte array.
+ *
+ * TODO : change position and length to
  */
 public abstract class ParameterStream extends Parameter {
 
@@ -37,7 +41,16 @@ public abstract class ParameterStream extends Parameter {
         this.length = length;
     }
 
-    public abstract void format (long packetId);
+    protected byte[] strip (byte[] data) {
+        return Arrays.copyOfRange(data, position, position + length);
+    }
+
+    public abstract void format (Packet packet, byte[] data);
+
+    @Override
+    public void format (Packet packet, Object data) {
+        format(packet, (byte[]) data);
+    }
 
     public int getPosition() {
         return position;

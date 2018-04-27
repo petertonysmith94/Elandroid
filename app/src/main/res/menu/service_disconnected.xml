@@ -4,7 +4,7 @@
 
     <group android:id="@+id/service_disconnected">
         <item
-            android:id="@+id/menu_disconnected_connect"
+            android:id="@+id/menu_connect"
             android:orderInCategory="1"
             android:icon="@drawable/ic_bluetooth_connect_white_24dp"
             android:title="@string/action_connect"

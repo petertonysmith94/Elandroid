@@ -1,4 +1,4 @@
-package com.elan_droid.elandroid.database.view;
+package com.elan_droid.elandroid.database.view_model;
 
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;

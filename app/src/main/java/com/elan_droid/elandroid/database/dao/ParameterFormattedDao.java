@@ -23,15 +23,15 @@ interface ParameterFormattedDao {
     List<ParameterFormatted> fetchFormatted (long messageId);
 
     @Insert
-    public abstract long insertFormatted (ParameterFormatted element);
+    long insertFormatted (ParameterFormatted element);
 
     @Insert
-    public abstract void insertFormatted (ParameterFormatted... elements);
+    void insertFormatted (ParameterFormatted... elements);
 
     @Delete
-    public abstract void deleteFormatted (ParameterFormatted element);
+    void deleteFormatted (ParameterFormatted element);
 
     @Delete
-    public abstract void deleteFormatted (ParameterFormatted... elements);
+    void deleteFormatted (ParameterFormatted... elements);
 
 }

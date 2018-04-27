@@ -1,12 +1,18 @@
 package com.elan_droid.elandroid.database.relation;
 
 import android.arch.persistence.room.Embedded;
+import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.Relation;
 
+import com.elan_droid.elandroid.database.embedded.Request;
+import com.elan_droid.elandroid.database.embedded.Response;
+import com.elan_droid.elandroid.database.entity.Flag;
 import com.elan_droid.elandroid.database.entity.Message;
 import com.elan_droid.elandroid.database.entity.Parameter;
+import com.elan_droid.elandroid.database.entity.ParameterStream;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -25,29 +31,46 @@ public class Command {
     )
     private List<Parameter> parameters;
 
+    @Ignore
+    private long tripId;
+
     public Command (Message message, Parameter[] parameters) {
-        this.message = message;
-        this.parameters = new ArrayList<>(parameters.length);
-        for (Parameter p : parameters) {
-            this.parameters.add(p);
-        }
+        this (message, Arrays.asList(parameters));
     }
 
     public Command (Message message, List<Parameter> parameters) {
         this.message = message;
         this.parameters = parameters;
-    }
 
-    public void format () {
+        List<ParameterStream> streamParameters = new ArrayList<>();
 
+        for (Parameter p : parameters) {
+            if (p instanceof ParameterStream) {
+                streamParameters.add((ParameterStream) p);
+            }
+        }
+
+        this.message.getResponse().setStreamParameters(streamParameters);
     }
 
     public Message getMessage() {
         return message;
     }
 
-    public void setMessage(Message message) {
+    protected void setMessage(Message message) {
         this.message = message;
+    }
+
+    public long getMessageId() {
+        return message.getId();
+    }
+
+    public Request getRequest() {
+        return message.getRequest();
+    }
+
+    public Response getResponse() {
+        return message.getResponse();
     }
 
     public List<Parameter> getParameters() {
@@ -60,8 +83,15 @@ public class Command {
         return tmp;
     }
 
-    public void setParameters(List<Parameter> parameters) {
+    protected void setParameters(List<Parameter> parameters) {
         this.parameters = parameters;
     }
 
+    public long getTripId() {
+        return tripId;
+    }
+
+    protected void setTripId(long tripId) {
+        this.tripId = tripId;
+    }
 }

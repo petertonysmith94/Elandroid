@@ -18,7 +18,7 @@ import com.elan_droid.elandroid.ui.generic.ServiceActivity;
 import static android.app.Activity.RESULT_OK;
 
 /**
- * Created by BorisJohnson on 4/23/2018.
+ * Created by Peter Smith on 4/23/2018.
  */
 
 public class SaveTripDialog extends DialogFragment implements DialogInterface.OnClickListener {

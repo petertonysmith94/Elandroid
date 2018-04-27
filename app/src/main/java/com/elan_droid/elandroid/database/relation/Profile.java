@@ -3,6 +3,7 @@ package com.elan_droid.elandroid.database.relation;
 import android.arch.persistence.room.Embedded;
 import android.arch.persistence.room.Ignore;
 
+import com.elan_droid.elandroid.database.entity.Message;
 import com.elan_droid.elandroid.database.entity.User;
 import com.elan_droid.elandroid.database.entity.Vehicle;
 

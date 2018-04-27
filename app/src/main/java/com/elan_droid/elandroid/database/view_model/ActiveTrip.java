@@ -1,4 +1,4 @@
-package com.elan_droid.elandroid.database.view;
+package com.elan_droid.elandroid.database.view_model;
 
 import android.app.Application;
 import android.arch.core.util.Function;
@@ -6,18 +6,21 @@ import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MediatorLiveData;
 import android.arch.lifecycle.MutableLiveData;
+import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.Transformations;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.elan_droid.elandroid.database.AppDatabase;
+import com.elan_droid.elandroid.database.entity.Flag;
 import com.elan_droid.elandroid.database.entity.Packet;
 import com.elan_droid.elandroid.database.entity.Trip;
 
 import java.util.List;
 
 /**
- * Created by BorisJohnson on 4/22/2018.
+ * Created by Peter Smith on 4/22/2018.
  */
 
 public class ActiveTrip extends AndroidViewModel {
@@ -27,13 +30,14 @@ public class ActiveTrip extends AndroidViewModel {
 
     private final MutableLiveData<Trip> trip;
 
+    private final MediatorLiveData<Packet> latestPacketWithFlags;
+
     private final LiveData<Packet> latestPacket;
 
+
     private final LiveData<Integer> packetCount;
-    //private final LiveData<Packet> latestPacket;
 
-
-    public ActiveTrip (@NonNull Application application) {
+    public ActiveTrip (@NonNull final Application application) {
         super (application);
         packetModel = new PacketModel(application);
 
@@ -42,9 +46,33 @@ public class ActiveTrip extends AndroidViewModel {
         this.latestPacket = Transformations.switchMap(this.trip, new Function<Trip, LiveData<Packet>>() {
             @Override
             public LiveData<Packet> apply(Trip trip) {
-                return trip == null ? null : database.packetDao().getLatest(trip.getId());
+                LiveData<Packet> output = null;
+
+                if (trip != null) {
+                    output = database.packetDao().getLatestPacket(trip.getId());
+                }
+
+                return output;
             }
         });
+
+        latestPacketWithFlags = new MediatorLiveData<>();
+        latestPacketWithFlags.addSource(this.latestPacket, new Observer<Packet>() {
+            @Override
+            public void onChanged(@Nullable final Packet packet) {
+                if (packet != null) {
+                    new FlagModel.FetchFlagsTask(database) {
+                        @Override
+                        protected void onPostExecute(List<Flag> flags) {
+                            packet.setFlags(flags);
+                            latestPacketWithFlags.postValue(packet);
+                        }
+                    }.execute(packet.getId());
+                }
+            }
+        });
+
+
         this.packetCount = Transformations.switchMap(this.trip, new Function<Trip, LiveData<Integer>>() {
             @Override
             public LiveData<Integer> apply(Trip trip) {
@@ -53,7 +81,9 @@ public class ActiveTrip extends AndroidViewModel {
         });
     }
 
-    public LiveData<Trip> getTrip() {
+
+
+    public LiveData<Trip> getActiveTrip() {
         return trip;
     }
 
@@ -63,7 +93,7 @@ public class ActiveTrip extends AndroidViewModel {
 
 
     public LiveData<Packet> getLatest() {
-        return latestPacket;
+        return latestPacketWithFlags;
     }
 
     public LiveData<Integer> getPacketCount() {

@@ -1,19 +1,15 @@
-package com.elan_droid.elandroid.database.view;
+package com.elan_droid.elandroid.database.view_model;
 
 import android.app.Application;
 import android.arch.core.util.Function;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
-import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.Transformations;
 import android.content.Context;
 import android.os.AsyncTask;
-import android.support.annotation.Nullable;
 
 import com.elan_droid.elandroid.R;
 import com.elan_droid.elandroid.database.AppDatabase;
-import com.elan_droid.elandroid.database.entity.Trip;
 import com.elan_droid.elandroid.database.entity.User;
 import com.elan_droid.elandroid.database.relation.Profile;
 

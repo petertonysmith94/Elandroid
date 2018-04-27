@@ -1,33 +1,39 @@
 package com.elan_droid.elandroid.ui.page;
 
+import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.Layout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.elan_droid.elandroid.R;
-import com.elan_droid.elandroid.adapter.TripAdapter;
+import com.elan_droid.elandroid.database.entity.Flag;
+import com.elan_droid.elandroid.database.entity.Packet;
 import com.elan_droid.elandroid.database.entity.Parameter;
 import com.elan_droid.elandroid.database.entity.ParameterBitwise8;
 import com.elan_droid.elandroid.database.entity.ParameterFormatted;
+import com.elan_droid.elandroid.database.entity.Trip;
 import com.elan_droid.elandroid.database.relation.DetailedPage;
-import com.elan_droid.elandroid.database.view.ParameterModel;
-import com.elan_droid.elandroid.ui.dashboard.BaseDashboardPage;
+import com.elan_droid.elandroid.database.relation.ParameterFlag;
+import com.elan_droid.elandroid.database.view_model.ParameterModel;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
- * Created by BorisJohnson on 4/21/2018.
+ * Created by Peter Smith on 4/21/2018.
  */
 
-public class PacketListPage extends BasePage {
+public class ListPage extends BasePage {
 
     private ParameterModel parameterModel;
 
@@ -43,7 +49,7 @@ public class PacketListPage extends BasePage {
         Bundle params = new Bundle();
         params.putParcelable(DetailedPage.EXTRA, page);
 
-        Fragment fragment = new PacketListPage();
+        Fragment fragment = new ListPage();
         fragment.setArguments(params);
         return fragment;
     }
@@ -64,7 +70,8 @@ public class PacketListPage extends BasePage {
 
         handleBundle(getArguments());
 
-        mAdapter = new ParameterAdapter(new ArrayList<Parameter>(), null);
+        mAdapter = new ParameterAdapter(getContext(), new ParameterList(), null);
+
 
         parameterModel = ViewModelProviders.of(getActivity()).get(ParameterModel.class);
         parameterModel.fetchParameters(mPage.getPage().getMessageId(), new ParameterModel.FetchParameterCallback() {
@@ -73,6 +80,25 @@ public class PacketListPage extends BasePage {
                 updateParameters(parameters);
             }
         });
+    }
+
+    @Override
+    public void startTrip(Trip trip) {
+        tripModel.getLatest().observe(this, new Observer<Packet>() {
+            @Override
+            public void onChanged(@Nullable Packet packet) {
+                updatePacket(packet);
+            }
+        });
+    }
+
+    @Override
+    public void stopTrip() {
+        tripModel.getLatest().removeObservers(this);
+    }
+
+    private void updatePacket (Packet packet) {
+        mAdapter.update(packet);
     }
 
     private void updateParameters (List<Parameter> parameters) {
@@ -84,7 +110,7 @@ public class PacketListPage extends BasePage {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_parameter_list, container, false);
 
-        mLayoutManager = new LinearLayoutManager(container.getContext());
+        mLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
 
         mRecyclerView = (RecyclerView) view.findViewById(R.id.parameter_list);
         mRecyclerView.setHasFixedSize(true);
@@ -94,28 +120,63 @@ public class PacketListPage extends BasePage {
         return view;
     }
 
+    public static class ParameterList extends ArrayList<ParameterFlag> {
+
+        private Map<Long, ParameterFlag> parameterMap;
+
+        public ParameterList() {
+            super();
+
+            parameterMap = new HashMap<>();
+        }
+
+        public void updateParameters (@NonNull List<Parameter> parameters) {
+            clear();
+            parameterMap.clear();
+            ParameterFlag tmp;
+
+            for (Parameter p : parameters) {
+                tmp = new ParameterFlag(p);
+                add(tmp);
+                parameterMap.put(p.getId(), tmp);
+            }
+        }
+
+        public void updatePacket (@NonNull Packet packet) {
+            for (Flag flag : packet.getFlags()) {
+                if (parameterMap.containsKey(flag.getParameterId())) {
+                    parameterMap.get(flag.getParameterId()).setValue(flag.toString());
+                }
+            }
+        }
+
+    }
 
     public static class ParameterAdapter extends RecyclerView.Adapter<ParameterAdapter.BaseViewHolder> {
 
-        private List<Parameter> parameters;
+        private Context context;
+        private ParameterList parameters;
         private View.OnClickListener listener;
 
-        public ParameterAdapter (List<Parameter> parameters, View.OnClickListener listener) {
+        public ParameterAdapter (Context context, ParameterList parameters, View.OnClickListener listener) {
+            this.context = context;
             this.parameters = parameters;
             this.listener = listener;
         }
 
-        public void update (List<Parameter> parameters) {
-            if (parameters != null && this.parameters != parameters) {
-                this.parameters.clear();
-                this.parameters.addAll(parameters);
-                notifyDataSetChanged();
-            }
+        public void update (@NonNull List<Parameter> parameters) {
+            this.parameters.updateParameters(parameters);
+            notifyDataSetChanged();
+        }
+
+        public void update (@NonNull Packet packet) {
+            this.parameters.updatePacket(packet);
+            notifyDataSetChanged();
         }
 
         @Override
         public int getItemViewType(int position) {
-            return parameters.get(position).getType().getValue();
+            return parameters.get(position).getParameter().getType().getValue();
         }
 
         @Override
@@ -125,22 +186,22 @@ public class PacketListPage extends BasePage {
 
         @Override
         public BaseViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+            LayoutInflater inflater = LayoutInflater.from(context);
 
             switch (viewType) {
                 case Parameter.Type.BITWISE_VALUE:
                     return new ParameterBitwise8.ListViewHolder (
-                            inflater.inflate(R.layout.list_item_bitwise, null)
+                            inflater.inflate(R.layout.list_item_bitwise, parent, false)
                     );
 
                 case Parameter.Type.FORMATTED_VALUE:
                     return new ParameterFormatted.ListViewHolder (
-                            inflater.inflate(R.layout.list_item_formatted, null)
+                            inflater.inflate(R.layout.list_item_formatted, parent, false)
                     );
 
                 default:
                     return new NothingViewHolder (
-                            inflater.inflate(R.layout.list_item_nothing, null)
+                            inflater.inflate(R.layout.list_item_nothing, parent, false)
                     );
             }
         }
@@ -156,7 +217,7 @@ public class PacketListPage extends BasePage {
                 super (itemView);
             }
 
-            public abstract void bind(Parameter parameter, View.OnClickListener listener);
+            public abstract void bind(ParameterFlag parameter, View.OnClickListener listener);
 
         }
 
@@ -166,7 +227,7 @@ public class PacketListPage extends BasePage {
                 super (itemView);
             }
 
-            public void bind (Parameter parameter, View.OnClickListener listener) {
+            public void bind (ParameterFlag parameter, View.OnClickListener listener) {
 
             }
 

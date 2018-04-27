@@ -1,4 +1,4 @@
-package com.elan_droid.elandroid.ui.generic;
+package com.elan_droid.elandroid.ui.dialog;
 
 
 import android.app.AlertDialog;

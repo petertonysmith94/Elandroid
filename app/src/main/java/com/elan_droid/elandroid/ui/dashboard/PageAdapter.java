@@ -7,7 +7,7 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 
 import com.elan_droid.elandroid.database.entity.Page;
 import com.elan_droid.elandroid.database.relation.DetailedPage;
-import com.elan_droid.elandroid.ui.page.PacketListPage;
+import com.elan_droid.elandroid.ui.page.ListPage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,7 +61,7 @@ public class PageAdapter extends FragmentStatePagerAdapter  {
     @Override
     public Fragment getItem(int position) {
         final DetailedPage page = mPages.get(position);
-        Fragment fragment = PacketListPage.getInstance(page);
+        Fragment fragment = ListPage.getInstance(page);
         fragment.setRetainInstance(false);
         page.setTarget(fragment);
         return fragment;

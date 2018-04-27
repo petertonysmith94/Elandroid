@@ -1,6 +1,7 @@
 package com.elan_droid.elandroid.database.entity;
 
 import android.arch.persistence.room.ColumnInfo;
+import android.arch.persistence.room.Database;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.Ignore;
@@ -8,8 +9,11 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.elan_droid.elandroid.R;
-import com.elan_droid.elandroid.ui.page.PacketListPage;
+import com.elan_droid.elandroid.database.relation.ParameterFlag;
+import com.elan_droid.elandroid.ui.page.ListPage;
 import com.elan_droid.elandroid.ui.widget.Widget;
+
+import java.math.BigInteger;
 
 import static android.arch.persistence.room.ForeignKey.CASCADE;
 
@@ -117,10 +121,29 @@ public class ParameterFormatted extends ParameterStream {
     }
 
     @Override
-    public void format(long packetId) {
-
+    // TODO: remaster this process to process any value (int, double,  hex)
+    public void format(Packet packet, byte[] data) {
+        final double value = format(data);
+        packet.addFlag(new FlagFormatted(getId(), packet.getId(), data, value, format(value)));
     }
 
+    /**
+     * Formats bytes into double value => then applies multiplier and offset
+     * @param data
+     * @return
+     */
+    private double format (final byte[] data) {
+        return ((new BigInteger(data).doubleValue()) * multiplier) + offset;
+    }
+
+    private String format (final Double data) {
+        if (format.equals("%d") || format.equals("%x")) {
+            return String.format(format, data.intValue());
+        }
+        else {
+            return String.format(format, data);
+        }
+    }
 
     public double getMultiplier() {
         return multiplier;
@@ -162,7 +185,7 @@ public class ParameterFormatted extends ParameterStream {
         this.signed = signed;
     }
 
-    public static class ListViewHolder extends PacketListPage.ParameterAdapter.BaseViewHolder {
+    public static class ListViewHolder extends ListPage.ParameterAdapter.BaseViewHolder {
 
         TextView paramName;
         TextView packetValue;
@@ -176,10 +199,10 @@ public class ParameterFormatted extends ParameterStream {
             paramUnits = (TextView) view.findViewById(R.id.list_item_formatted_parameter_units);
         }
 
-        public void bind (Parameter parameter, View.OnClickListener listener) {
-            final ParameterFormatted formatted = (ParameterFormatted) parameter;
+        public void bind (ParameterFlag parameterFlag, View.OnClickListener listener) {
+            final ParameterFormatted formatted = (ParameterFormatted) parameterFlag.getParameter();
             paramName.setText(formatted.getName());
-            packetValue.setText("--");
+            packetValue.setText(parameterFlag.getValue());
             paramUnits.setText(formatted.getUnits());
         }
     }

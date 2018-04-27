@@ -24,7 +24,7 @@ import com.elan_droid.elandroid.database.entity.Page;
 import com.elan_droid.elandroid.database.entity.PageItem;
 import com.elan_droid.elandroid.database.relation.DetailedPage;
 import com.elan_droid.elandroid.database.relation.Profile;
-import com.elan_droid.elandroid.database.view.PageModel;
+import com.elan_droid.elandroid.database.view_model.PageModel;
 import com.elan_droid.elandroid.ui.dialog.AddPageDialog;
 import com.elan_droid.elandroid.ui.generic.BaseFragment;
 

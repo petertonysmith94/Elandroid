@@ -1,10 +1,9 @@
-package com.elan_droid.elandroid.ui.dialog;
+package com.elan_droid.elandroid.ui.bluetooth;
 
 import android.Manifest;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -12,26 +11,23 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.support.annotation.StyleRes;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
 import com.elan_droid.elandroid.R;
-import com.elan_droid.elandroid.ui.profile.ProfileActivity;
 
 /**
  * Created by Peter Smith
  */
 
-public class BluetoothDeviceSelectDialog extends DialogFragment {
+public class DeviceSelectDialog extends DialogFragment {
 
     private static final int REQUEST_ENABLE_BT = 0;
     private static final int REQUEST_COURSE_LOCATION = 1;
@@ -39,7 +35,7 @@ public class BluetoothDeviceSelectDialog extends DialogFragment {
     private BluetoothAdapter mAdapter;
 
     public static DialogFragment getInstance() {
-        DialogFragment dialog = new BluetoothDeviceSelectDialog();
+        DialogFragment dialog = new DeviceSelectDialog();
         return dialog;
     }
 
@@ -150,12 +146,6 @@ public class BluetoothDeviceSelectDialog extends DialogFragment {
                 break;
         }
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-    }
-
-
-    @Override
-    public void setupDialog(Dialog dialog, int style) {
-        super.setupDialog(dialog, style);
     }
 
     private void setupDialog(String title, final String positiveText, final String negativeText,

@@ -1,6 +1,15 @@
 package com.elan_droid.elandroid.database.embedded;
 
 import android.arch.persistence.room.ColumnInfo;
+import android.arch.persistence.room.Ignore;
+
+import com.elan_droid.elandroid.database.entity.Flag;
+import com.elan_droid.elandroid.database.entity.Packet;
+import com.elan_droid.elandroid.database.entity.ParameterStream;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Created by Peter Smith
@@ -20,10 +29,30 @@ public class Response {
     @ColumnInfo(name = COLUMN_PAYLOAD_LENGTH, typeAffinity = ColumnInfo.INTEGER)
     private int payloadLength;
 
+    @Ignore
+    private List<ParameterStream> streamParameters;
+
     public Response (int rawLength, int payloadOffset, int payloadLength) {
         this.rawLength = rawLength;
         this.payloadOffset = payloadOffset;
         this.payloadLength = payloadLength;
+        this.streamParameters = new ArrayList<>();
+    }
+
+    public boolean validate (byte[] data) {
+        return true;
+    }
+
+    public Packet format(Packet packet) {
+        final byte[] raw = packet.getData();
+        byte[] tmp;
+
+        for (ParameterStream sp : streamParameters) {
+            tmp = Arrays.copyOfRange(raw, sp.getPosition(), sp.getPosition() + sp.getLength());
+            sp.format(packet, tmp);
+        }
+
+        return packet;
     }
 
     public int getRawLength() {
@@ -50,4 +79,11 @@ public class Response {
         this.payloadLength = payloadLength;
     }
 
+    public List<ParameterStream> getStreamParameters() {
+        return streamParameters;
+    }
+
+    public void setStreamParameters(List<ParameterStream> streamParameters) {
+        this.streamParameters = streamParameters;
+    }
 }

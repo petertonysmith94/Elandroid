@@ -8,7 +8,8 @@ import android.arch.persistence.room.TypeConverters;
 import android.view.View;
 
 import com.elan_droid.elandroid.database.converter.StringArrayConverter;
-import com.elan_droid.elandroid.ui.page.PacketListPage;
+import com.elan_droid.elandroid.database.relation.ParameterFlag;
+import com.elan_droid.elandroid.ui.page.ListPage;
 import com.elan_droid.elandroid.ui.widget.Widget;
 
 import static android.arch.persistence.room.ForeignKey.CASCADE;
@@ -86,8 +87,8 @@ public class ParameterBitwise8 extends ParameterStream {
     }
 
     @Override
-    public void format(long packetId) {
-
+    public void format(Packet packet, byte[] data) {
+        //TODO: implement formatting method
     }
 
     public String[] getDescriptions() {
@@ -99,14 +100,15 @@ public class ParameterBitwise8 extends ParameterStream {
     }
 
 
-    public static class ListViewHolder extends PacketListPage.ParameterAdapter.BaseViewHolder {
+    //TODO: implement list view display for the parameter
+    public static class ListViewHolder extends ListPage.ParameterAdapter.BaseViewHolder {
 
         public ListViewHolder(View itemView) {
             super(itemView);
         }
 
-        public void bind (Parameter parameter, View.OnClickListener listener) {
-            final ParameterBitwise8 bitwise = (ParameterBitwise8) parameter;
+        public void bind (ParameterFlag parameterFlag, View.OnClickListener listener) {
+            final ParameterBitwise8 bitwise = (ParameterBitwise8) parameterFlag.getParameter();
 
         }
     }

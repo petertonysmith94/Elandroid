@@ -1,15 +1,12 @@
-package com.elan_droid.elandroid.database.view;
+package com.elan_droid.elandroid.database.view_model;
 
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
-import android.content.Context;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 
-import com.elan_droid.elandroid.R;
 import com.elan_droid.elandroid.database.AppDatabase;
 import com.elan_droid.elandroid.database.entity.Parameter;
-import com.elan_droid.elandroid.database.relation.Profile;
 
 import java.util.List;
 
@@ -53,7 +50,7 @@ public class ParameterModel extends AndroidViewModel {
         protected List<Parameter> doInBackground(Long... params) {
             List<Parameter> parameters = null;
             if(params.length > 0 && params[0] != 0) {
-                parameters = mmDatabase.parameterDao().fetch(params[0]);
+                parameters = mmDatabase.parameterDao().fetchParameters(params[0]);
             }
             return parameters;
         }

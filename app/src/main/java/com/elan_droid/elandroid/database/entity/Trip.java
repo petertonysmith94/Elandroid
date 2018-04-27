@@ -7,6 +7,9 @@ import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
 import android.support.annotation.Nullable;
 
+import com.elan_droid.elandroid.database.AppDatabase;
+import com.elan_droid.elandroid.database.relation.Profile;
+
 import static android.arch.persistence.room.ForeignKey.CASCADE;
 
 /**
@@ -39,22 +42,23 @@ public class Trip {
 
     // Associates a UserVehicle with a trip
     @ColumnInfo (name = User.REFERENCE_COLUMN_ID, typeAffinity = ColumnInfo.INTEGER)
-    private long mUserId;
+    private long userId;
 
-    //@ColumnInfo (name = COLUMN_START_TIME, typeAffinity = ColumnInfo.INTEGER)
-    //private long mMessageId;
+    @ColumnInfo (name = Message.REFERENCE_COLUMN_ID, typeAffinity = ColumnInfo.INTEGER)
+    private long messageId;
 
     @ColumnInfo (name = COLUMN_NAME, typeAffinity = ColumnInfo.TEXT)
     private String mName;
 
     @Ignore
-    public Trip (long userId, @Nullable String name) {
-        this (0, userId, name);
+    public Trip (Profile profile) {
+        this (AppDatabase.NEW_ENTITY_ID, profile.getProfileId(), profile.getDefaultMessageId(), "Active: " + profile.getName());
     }
 
-    public Trip (long id, long userId, @Nullable String name) {
+    public Trip (long id, long userId, long messageId, @Nullable String name) {
         this.mId = id;
-        this.mUserId = userId;
+        this.userId = userId;
+        this.messageId = messageId;
         this.mName = name;
     }
 
@@ -67,11 +71,19 @@ public class Trip {
     }
 
     public long getUserId() {
-        return mUserId;
+        return userId;
     }
 
     public void setUserId(long userId) {
-        this.mUserId = userId;
+        this.userId = userId;
+    }
+
+    public long getMessageId() {
+        return messageId;
+    }
+
+    public void setMessageId(long messageId) {
+        this.messageId = messageId;
     }
 
     public String getName() {

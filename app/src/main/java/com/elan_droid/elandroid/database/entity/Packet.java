@@ -9,7 +9,9 @@ import android.arch.persistence.room.TypeConverters;
 
 import com.elan_droid.elandroid.database.converter.DateTimeConverter;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by Peter Smith
@@ -34,6 +36,7 @@ public class Packet {
     public final static String REFERENCE_COLUMN_ID = "packet_id";
     public final static String COLUMN_ID = "packetId";
     public final static String COLUMN_TIMESTAMP = "timestamp";
+    public final static String COLUMN_DATA = "data";
 
     @PrimaryKey (autoGenerate = true)
     @ColumnInfo (name = COLUMN_ID, typeAffinity = ColumnInfo.INTEGER)
@@ -46,15 +49,23 @@ public class Packet {
     @TypeConverters (value = DateTimeConverter.class)
     private Date timestamp;
 
+    @ColumnInfo (name = COLUMN_DATA, typeAffinity = ColumnInfo.BLOB)
+    private byte[] data;
+
     @Ignore
-    public Packet (long tripId) {
-        this (0, tripId, new Date(System.currentTimeMillis()));
+    private List<Flag> flags;
+
+    @Ignore
+    public Packet (long tripId, byte... data) {
+        this (0, tripId, new Date(System.currentTimeMillis()), data);
     }
 
-    public Packet (long id, long tripId, Date timestamp) {
+    public Packet (long id, long tripId, Date timestamp, byte[] data) {
         this.id = id;
         this.tripId = tripId;
         this.timestamp = timestamp;
+        this.data = data;
+        this.flags = new ArrayList<>();
     }
 
     public long getId() {
@@ -79,5 +90,29 @@ public class Packet {
 
     public void setTimestamp(Date timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public void setTimestamp(long timestamp) {
+        this.timestamp = new Date(timestamp);
+    }
+
+    public byte[] getData() {
+        return data;
+    }
+
+    public void setData(byte[] data) {
+        this.data = data;
+    }
+
+    public List<Flag> getFlags() {
+        return flags;
+    }
+
+    public void setFlags(List<Flag> flags) {
+        this.flags = flags;
+    }
+
+    public void addFlag(Flag flag) {
+        this.flags.add(flag);
     }
 }

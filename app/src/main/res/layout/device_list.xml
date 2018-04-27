@@ -2,10 +2,9 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android">
 
     <data>
-        <import type="android.view.View"/>
         <variable
             name="data"
-            type="com.elan_droid.elandroid.ui.bluetooth.Devices"/>
+            type="com.elan_droid.elandroid.ui.bluetooth.DeviceList"/>
     </data>
 
     <FrameLayout
@@ -17,13 +16,13 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:text="There are no devices here"
-            android:visibility="@{data.getSize() > 0 ? View.GONE : View.VISIBLE}"/>
+            android:visibility="@{data.nothingVisibility}"/>
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/device_list"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:visibility="@{data.getSize() > 0 ? View.VISIBLE : View.GONE}"/>
+            android:visibility="@{data.listVisibility}"/>
 
     </FrameLayout>
 </layout>

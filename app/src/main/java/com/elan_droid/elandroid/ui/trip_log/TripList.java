@@ -20,9 +20,8 @@ import com.elan_droid.elandroid.R;
 import com.elan_droid.elandroid.adapter.TripAdapter;
 import com.elan_droid.elandroid.database.entity.Trip;
 import com.elan_droid.elandroid.database.relation.Profile;
-import com.elan_droid.elandroid.database.view.TripModel;
+import com.elan_droid.elandroid.database.view_model.TripModel;
 import com.elan_droid.elandroid.ui.generic.BaseFragment;
-import com.elan_droid.elandroid.ui.profile.ProfileActivity;
 
 import java.util.List;
 

@@ -3,28 +3,33 @@
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="@dimen/list_item_padding">
+    android:padding="4dp"
+    android:weightSum="7">
 
     <TextView
         android:id="@+id/list_item_formatted_parameter_title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="parameter title"
-        android:layout_weight="1"/>
+        android:layout_weight="5"/>
 
     <TextView
         android:id="@+id/list_item_formatted_packet_value"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_gravity="right"
-        android:text="3.1"/>
+        android:layout_gravity="end"
+        android:text="3.1"
+        android:textAlignment="textEnd"
+
+        android:layout_weight="1"/>
 
     <TextView
         android:id="@+id/list_item_formatted_parameter_units"
         android:layout_marginLeft="@dimen/list_item_margin_top"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_gravity="right"
-        android:text="Units"/>
+        android:text="Units"
+        android:textAlignment="textStart"
+        android:layout_weight="1"/>
 
 </LinearLayout>

@@ -1,23 +1,38 @@
 package com.elan_droid.elandroid.ui.page;
 
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 
 import com.elan_droid.elandroid.database.entity.Trip;
+import com.elan_droid.elandroid.database.view_model.ActiveTrip;
 
 /**
- * Created by BorisJohnson on 4/21/2018.
+ * Created by Peter Smith on 4/21/2018.
  */
 public abstract class BasePage extends Fragment {
 
+    protected ActiveTrip tripModel;
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
-    public boolean startTrip (Trip trip) {
-        return false;
+        tripModel = ViewModelProviders.of(getActivity()).get(ActiveTrip.class);
+        tripModel.getActiveTrip().observe(this, new Observer<Trip>() {
+            @Override
+            public void onChanged(@Nullable Trip trip) {
+                stopTrip();
+                startTrip(trip);
+            }
+        });
     }
+
+
+    public abstract void startTrip (Trip trip);
+
+    public abstract void stopTrip ();
 
 }

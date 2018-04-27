@@ -85,6 +85,8 @@ public abstract class Parameter {
         this.type = type;
     }
 
+    public abstract void format (Packet packet, Object data);
+
     public abstract Widget.Type[] getWidgetTypes();
 
     @Override

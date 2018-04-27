@@ -8,18 +8,14 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.elan_droid.elandroid.R;
-import com.elan_droid.elandroid.database.entity.Packet;
 import com.elan_droid.elandroid.database.entity.Trip;
-import com.elan_droid.elandroid.database.view.ActiveTrip;
-
-import java.util.List;
+import com.elan_droid.elandroid.database.view_model.ActiveTrip;
 
 /**
- * Created by BorisJohnson on 4/22/2018.
+ * Created by Peter Smith on 4/22/2018.
  */
 
 public class ActiveTripDebug extends Fragment {
@@ -55,7 +51,7 @@ public class ActiveTripDebug extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        mModel.getTrip().observe(getActivity(), new Observer<Trip>() {
+        mModel.getActiveTrip().observe(getActivity(), new Observer<Trip>() {
             @Override
             public void onChanged(@Nullable Trip trip) {
                 tripId.setText(trip == null ? "-" : "" + trip.getId());

@@ -8,8 +8,11 @@ import android.arch.persistence.room.migration.Migration;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
+import com.elan_droid.elandroid.database.dao.CommandDao;
+import com.elan_droid.elandroid.database.dao.FlagDao;
 import com.elan_droid.elandroid.database.dao.MessageDao;
 import com.elan_droid.elandroid.database.dao.PacketDao;
+import com.elan_droid.elandroid.database.dao.PacketFlagDao;
 import com.elan_droid.elandroid.database.dao.PageDao;
 import com.elan_droid.elandroid.database.dao.PageItemDao;
 import com.elan_droid.elandroid.database.dao.ParameterDao;
@@ -17,6 +20,7 @@ import com.elan_droid.elandroid.database.dao.ProfileDao;
 import com.elan_droid.elandroid.database.dao.TripDao;
 import com.elan_droid.elandroid.database.dao.UserDao;
 import com.elan_droid.elandroid.database.dao.VehicleDao;
+import com.elan_droid.elandroid.database.entity.FlagFormatted;
 import com.elan_droid.elandroid.database.entity.Packet;
 import com.elan_droid.elandroid.database.entity.ParameterFormatted;
 import com.elan_droid.elandroid.database.entity.Message;
@@ -39,11 +43,14 @@ import java.util.concurrent.Executors;
     version = 1,
     exportSchema = false,
     entities = {
-        Vehicle.class, User.class, Message.class, Page.class, PageItem.class,
-            Trip.class, ParameterBitwise8.class, ParameterFormatted.class, Packet.class
+        Vehicle.class, User.class, Message.class, Page.class, Trip.class, Packet.class,
+            ParameterBitwise8.class, ParameterFormatted.class, PageItem.class,
+            FlagFormatted.class
     }
 )
 public abstract class AppDatabase extends RoomDatabase {
+
+    public static final int NEW_ENTITY_ID = 0;
 
     /** the table name used by the database **/
     public static final String DATABASE_NAME = "elandroid";
@@ -92,8 +99,16 @@ public abstract class AppDatabase extends RoomDatabase {
         return INSTANCE;
     }
 
+
+    // Relationship dao s
     public abstract ProfileDao profileDao();
 
+    public abstract CommandDao commandDao();
+
+    public abstract PacketFlagDao packetFlagDao();
+
+
+    // Base entity dao s
     public abstract VehicleDao vehicleDao();
 
     public abstract UserDao userVehicleDao();
@@ -109,6 +124,8 @@ public abstract class AppDatabase extends RoomDatabase {
     public abstract ParameterDao parameterDao();
 
     public abstract PageItemDao pageItemDao();
+
+    public abstract FlagDao flagDao();
 
 
     static final Migration MIGRATION_1_2 = new Migration(1, 2) {

@@ -1,116 +1,185 @@
 package com.elan_droid.elandroid.service;
 
-import android.bluetooth.BluetoothManager;
 import android.os.Messenger;
-import android.os.RemoteException;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.elan_droid.elandroid.database.AppDatabase;
+import com.elan_droid.elandroid.database.embedded.Response;
+import com.elan_droid.elandroid.database.entity.Flag;
 import com.elan_droid.elandroid.database.entity.Packet;
+import com.elan_droid.elandroid.database.entity.ParameterStream;
 import com.elan_droid.elandroid.database.entity.Trip;
-import com.elan_droid.elandroid.database.view.TripModel;
+import com.elan_droid.elandroid.database.relation.Command;
+import com.elan_droid.elandroid.database.view_model.TripModel;
+
+import java.util.Arrays;
 
 /**
- * Created by BorisJohnson on 4/22/2018.
+ * Created by Peter Smith on 4/22/2018.
  */
 
-public class LoggingManager {
+public class LoggingManager extends BaseManager {
 
     public final static String TAG = "LoggingManager";
 
-    private Messenger messenger;
+
     private AppDatabase database;
 
-
-    private DebugThread debugThread;
-
-    private Trip currentTrip;
+    // Process threads
+    //private DebugThread debugThread;
     private int state;
 
+    //
+    private Trip currTrip;
+    private Command currCommand;
+
+
     public LoggingManager (Messenger messenger, AppDatabase database) {
-        this.messenger = messenger;
+        super (messenger);
+
         this.database = database;
         this.state = BaseService.LOGGING_STATE_STOPPED;
     }
 
     /**
-     * Sends a message via the messenger which was passed in
-     *
-     * @param message the message to be sent
-     */
-    private void send(android.os.Message message) {
-        try {
-            messenger.send(message);
-        } catch (RemoteException e) {
-            Log.e(TAG, "Unabled to sendMessage message", e);
-        }
-    }
-
-    /**
-     * Synchronously sets the state of the logging manager
+     * Synchronously sets the state of the logging manager.
      *
      * @param state new state
      */
     private synchronized void setState(int state) {
-        Log.d(TAG, "setState()  " + this.state + " => " + state);
-        this.state = state;
+        if (this.state != state) {
+            Log.d(TAG, "setState()  " + this.state + " => " + state);
+            this.state = state;
 
-        android.os.Message msg = new android.os.Message();
-        msg.what = BaseService.MESSAGE_LOGGING_STATE_CHANGE;
-        msg.arg1 = state;
-        msg.obj = currentTrip;
-        send(msg);
+            android.os.Message msg = new android.os.Message();
+            msg.what = BaseService.MESSAGE_LOGGING_STATE_CHANGE;
+            msg.arg1 = state;
+            msg.obj = currTrip;
+            send(msg);
+        }
     }
 
-    public synchronized void start (Trip trip) {
+    public synchronized int getState() {
+        return this.state;
+    }
+
+
+    protected synchronized void start (Trip trip, Command  command) {
         if (state == BaseService.LOGGING_STATE_STOPPED) {
-            currentTrip = trip;
-            setState (BaseService.LOGGING_STATE_STARTED);
-            debugThread = new DebugThread(database, currentTrip);
-            debugThread.start();
+            // Set the current trip + command, starts the process threads
+            setTrip(trip);
+            setCommand(command);
+            setState(BaseService.LOGGING_STATE_STARTED);
+            startThreads();
         }
+        else sendToast ("There is already a trip running!");
+    }
+
+    /**
+     *
+     */
+    private synchronized void startThreads () {
+        stopThreads();
+
+        //debugThread = new DebugThread(database, currTrip, currCommand);
+        //debugThread.start();
     }
 
     private synchronized void stop () {
-        if (state == BaseService.LOGGING_STATE_STARTED) {
-            setState(BaseService.LOGGING_STATE_STOPPED);
-
-            if (debugThread != null) {
-                debugThread.cancel();
-                debugThread = null;
-            }
-        }
+        stopThreads();
+        setState(BaseService.LOGGING_STATE_STOPPED);
     }
 
+    /**
+     *
+     * @param trip
+     */
+    private void setTrip (@NonNull Trip trip) {
+        this.currTrip = trip;
+    }
+
+
+
+    private void setCommand (@NonNull Command command) {
+        this.currCommand = command;
+    }
+
+
+
+
+    private synchronized void stopThreads () {
+
+    }
+
+    /**
+     * Stops and deletes the current trip
+     */
     synchronized void stopAndDelete () {
         stop();
-        new TripModel.DeleteTripAsyncTask(database, null).execute(currentTrip);
+        new TripModel.DeleteTripAsyncTask(database, null).execute(currTrip);
     }
 
+    /**
+     * Stops and saves the current trip with the given name
+     * @param tripName  the new trip name
+     */
     synchronized void stopAndSave (String tripName) {
         stop();
-        currentTrip.setName(tripName);
-        new TripModel.UpdateAsyncTask(database, null).execute(currentTrip);
+        currTrip.setName(tripName);
+        new TripModel.UpdateAsyncTask(database, null).execute(currTrip);
     }
 
+    /*
     private static class DebugThread extends Thread {
 
         private final static int TIMEOUT_MS = 1000;
 
         private AppDatabase database;
-        private final long tripId;
+        private final Trip trip;
+        private final Response response;
         private boolean running;
 
-        public DebugThread (AppDatabase database, Trip trip) {
+        private byte[] debugResponse;
+
+        public DebugThread (AppDatabase database, Trip trip, Command command) {
             this.database = database;
-            this.tripId = trip.getId();
+            this.trip = trip;
+            this.response = command.getMessage().getResponse();
+            this.debugResponse = createTestResponse(command.getMessage().getResponse(), (byte) 00, (byte) 15);
             running = true;
+        }
+
+        private byte[] createTestResponse(Response response, final byte fill, final byte value) {
+            byte[] buffer = new byte[response.getPayloadLength()];
+
+            for (ParameterStream p : response.getStreamParameters()) {
+                final int end = p.getPosition() + p.getLength();
+
+                Arrays.fill(buffer, p.getPosition(), end - 1, fill);
+                Arrays.fill(buffer, end - 1, end, value);
+            }
+
+            return buffer;
+        }
+
+        private void fill (byte[] buffer, byte value, byte fill) {
+            final int lastIndex = buffer.length - 1;
+
+            for (int i = 0; i < buffer.length; i++) {
+                buffer[i] = (i == lastIndex) ? value : fill;
+            }
         }
 
         @Override
         public void run() {
+            Flag[] flags;
+
             while (running) {
-                database.packetDao().insert(new Packet(tripId));
+                final long packetId = database.packetDao().insert(new Packet(trip.getId()));
+
+                flags = response.format(packetId, debugResponse);
+                database.flagDao().insert (flags);
 
                 try {
                     sleep(TIMEOUT_MS);
@@ -121,9 +190,14 @@ public class LoggingManager {
             }
         }
 
+
+
+
+
         public void cancel() {
             running = false;
         }
     }
+    */
 
 }

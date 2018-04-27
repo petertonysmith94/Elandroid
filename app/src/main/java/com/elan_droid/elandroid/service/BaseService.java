@@ -1,6 +1,7 @@
 package com.elan_droid.elandroid.service;
 
 import android.app.Service;
+import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.IBinder;
@@ -11,19 +12,19 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.elan_droid.elandroid.database.AppDatabase;
-import com.elan_droid.elandroid.database.entity.Packet;
 import com.elan_droid.elandroid.database.entity.Trip;
+import com.elan_droid.elandroid.database.relation.Command;
 import com.elan_droid.elandroid.database.relation.Profile;
-import com.elan_droid.elandroid.database.view.TripModel;
+import com.elan_droid.elandroid.database.view_model.CommandModel;
+import com.elan_droid.elandroid.database.view_model.TripModel;
+import com.elan_droid.elandroid.service.new_strategy.IOStrategy;
+import com.elan_droid.elandroid.service.new_strategy.LoggingStrategy;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
 
 /**
- * Created by BorisJohnson on 4/22/2018.
+ * Created by Peter Smith on 4/22/2018.
  */
 
 public class BaseService extends Service {
@@ -34,20 +35,25 @@ public class BaseService extends Service {
     public static final int MESSAGE_REGISTER_CLIENT = 1;
     public static final int MESSAGE_UNREGISTER_CLIENT = 2;
 
-    public static final int MESSAGE_COMMAND_START_LOGGING = 3;
-    public static final int MESSAGE_LOGGING_STATE_CHANGE = 4;
+    public static final int MESSAGE_COMMAND_BLUETOOTH_CONNECT = 3;
+    public static final int MESSAGE_BLUETOOTH_STATE_CHANGE = 4;
+    public static final int MESSAGE_COMMAND_BLUETOOTH_DISCONNECT = 5;
+
+    public static final int MESSAGE_COMMAND_START_LOGGING = 7;
+    public static final int MESSAGE_LOGGING_STATE_CHANGE = 8;
         public static final int LOGGING_STATE_STARTED = 0;
         public static final int LOGGING_STATE_STOPPED = 1;
-    public static final int MESSAGE_COMMAND_STOP_LOGGING = 5;
-
-
-
+    public static final int MESSAGE_COMMAND_STOP_LOGGING = 9;
 
     private final Messenger messenger = new Messenger(new IncomingHandler());
     private final List<Messenger> clients = new ArrayList<>();
 
     private AppDatabase database;
     private LoggingManager loggingManager;
+    private BluetoothManager bluetoothManager;
+
+    private Trip activeTrip;
+    private Command activeCommand;
 
     private Profile activeProfile;
     private boolean init = false;
@@ -56,11 +62,8 @@ public class BaseService extends Service {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
-                case MESSAGE_TOAST:
-                    sendToClients(msg);
-                    break;
-
                 case MESSAGE_REGISTER_CLIENT:
+                    //
                     if (!clients.contains(msg.replyTo)) {
                         clients.add(msg.replyTo);
                     }
@@ -70,8 +73,16 @@ public class BaseService extends Service {
                     clients.remove(msg.replyTo);
                     break;
 
+                case MESSAGE_COMMAND_BLUETOOTH_CONNECT:
+                    connectBluetooth((BluetoothDevice) msg.obj);
+                    break;
+
+                case MESSAGE_COMMAND_BLUETOOTH_DISCONNECT:
+                    disconnectBluetooth();
+                    break;
+
                 case MESSAGE_COMMAND_START_LOGGING:
-                    startLogging ((Profile) msg.obj);
+                    startLoggingWithValidation( (Trip) msg.obj);
                     break;
 
                 case MESSAGE_COMMAND_STOP_LOGGING:
@@ -91,7 +102,6 @@ public class BaseService extends Service {
 
         if (!init) {
             database = AppDatabase.getInstance(getApplicationContext());
-            loggingManager = new LoggingManager(messenger, database);
             init = true;
         }
     }
@@ -124,6 +134,10 @@ public class BaseService extends Service {
         }
     }
 
+    /**
+     * Send's a message back with some Toast in it, which will "popup" to user.
+     * @param message   the message to be displayed
+     */
     private void sendToast (String message) {
         Message msg = new Message();
         msg.what = MESSAGE_TOAST;
@@ -132,27 +146,110 @@ public class BaseService extends Service {
     }
 
 
+    /**
+     * Bluetooth methods
+     */
 
-    private void startLogging (Profile profile) {
-        if (activeProfile != null) {
-            sendToast("There is already an active trip.");
-            return;
+    /**
+     *
+     * @return
+     */
+    private BluetoothManager getBluetoothManager() {
+        if (bluetoothManager == null) {
+            bluetoothManager = new BluetoothManager(messenger);
         }
-        if (profile == null) {
-            sendToast("You can't start a trip with no profile selected");
-            return;
+        return bluetoothManager;
+    }
+
+    /**
+     * Connects to a given bluetooth device securely
+     * @param device    the target Bluetooth device
+     */
+    private void connectBluetooth (BluetoothDevice device) {
+        getBluetoothManager().connect(device, true);
+    }
+
+    /**
+     * Disconnects from Bluetooth
+     */
+    private void disconnectBluetooth () {
+        if (loggingManager != null) {
+            loggingManager.stopAndSave("Latest trip");
+        }
+        bluetoothManager.disconnect();
+    }
+
+
+    /**
+     * LOGGING SECTION
+     */
+
+    private LoggingManager getLoggingManager() {
+        if (loggingManager == null) {
+            loggingManager = new LoggingManager(messenger, database);
+        }
+        return loggingManager;
+    }
+
+    /**
+     *
+     * @param trip
+     */
+    private void startLoggingWithValidation (Trip trip) {
+
+        if (loggingManager != null) {
+            sendToast("There is already an active trip");
         }
 
-        new TripModel.PopulateAsyncTask(database, new TripModel.InsertTripCallback() {
-            @Override
-            public void onTripInserted(Trip trip) {
-                if (trip != null) {
-                    loggingManager.start(trip);
+        else if (trip == null) {
+            sendToast("Unable to start trip, please try again");
+        }
+
+        else if (trip.getId() == 0) {   // We need to insert the trip into the database
+            new TripModel.PopulateAsyncTask(database, new TripModel.InsertTripCallback() {
+                @Override
+                public void onTripInserted(Trip trip) {
+                    if (trip != null) {
+                        startLogging(trip);
+                    }
+                    else sendToast("Unable to create new trip.");
                 }
-                else
-                    sendToast("Unable to create new trip.");
-            }
-        }).execute(new Trip(profile.getProfileId(), profile.getName() + "_tmp"));
+            }).execute(trip);
+        }
+        // The trip is already in the database, continue with validation
+        else startLogging(trip);
+    }
+
+    /**
+     *
+     * @param trip
+     */
+    private void startLogging (final Trip trip) {
+        if (trip.getMessageId() == 0) {
+            sendToast ("The trip has no message associated");
+        }
+        else {
+            new CommandModel.FetchCommandTask(database, new CommandModel.FetchCommandCallback() {
+                @Override
+                public void onFetchCommand(Command command) {
+                    startLogging(trip, command);
+                }
+            }).execute(trip.getMessageId());
+        }
+    }
+
+    /**
+     * Command for starting logging with NO validation.
+     * DON'T use this method directly!
+     * @param trip
+     * @param command
+     */
+    private void startLogging (final Trip trip, final Command command) {
+        this.activeTrip = trip;
+        this.activeCommand = command;
+
+        IOStrategy strategy = new LoggingStrategy(database, trip.getId(), command.getRequest(), command.getResponse());
+        getBluetoothManager().setStrategy(strategy);
     }
 
     private void stopLogging (String tripName) {

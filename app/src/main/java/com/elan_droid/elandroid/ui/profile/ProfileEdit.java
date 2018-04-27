@@ -21,8 +21,7 @@ import android.widget.Toast;
 
 import com.elan_droid.elandroid.R;
 import com.elan_droid.elandroid.database.relation.Profile;
-import com.elan_droid.elandroid.database.view.ActiveProfile;
-import com.elan_droid.elandroid.database.view.ProfileModel;
+import com.elan_droid.elandroid.database.view_model.ActiveProfile;
 
 import java.util.ArrayList;
 

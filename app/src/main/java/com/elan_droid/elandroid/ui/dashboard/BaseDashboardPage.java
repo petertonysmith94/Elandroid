@@ -14,16 +14,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
-import android.widget.RelativeLayout;
 
 import com.elan_droid.elandroid.R;
 import com.elan_droid.elandroid.database.entity.PageItem;
 import com.elan_droid.elandroid.database.embedded.Position;
 import com.elan_droid.elandroid.database.embedded.Size;
 import com.elan_droid.elandroid.database.relation.DetailedPage;
-import com.elan_droid.elandroid.database.view.PageItemModel;
-import com.elan_droid.elandroid.database.view.PageModel;
+import com.elan_droid.elandroid.database.view_model.PageItemModel;
 
 import java.util.List;
 

@@ -1,21 +1,17 @@
-package com.elan_droid.elandroid.database.view;
+package com.elan_droid.elandroid.database.view_model;
 
 import android.app.Application;
-import android.arch.core.util.Function;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MediatorLiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.Transformations;
-import android.arch.lifecycle.ViewModel;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.support.annotation.Nullable;
 
 import com.elan_droid.elandroid.R;
 import com.elan_droid.elandroid.database.AppDatabase;
-import com.elan_droid.elandroid.database.dao.ProfileDao;
 import com.elan_droid.elandroid.database.entity.User;
 import com.elan_droid.elandroid.database.relation.Profile;
 
@@ -30,10 +26,13 @@ public class ActiveProfile extends AndroidViewModel {
 
     private AppDatabase mDatabase;
 
+
+
     private final MutableLiveData<Profile> mActive;
 
-    private final LiveData<List<Profile>> mProfiles;
 
+    // TODO: move to profile model, keep separated
+    private final LiveData<List<Profile>> mAllProfiles;
     private final MediatorLiveData<List<Profile>> mActiveProfiles;
 
     public ActiveProfile (Application application) {
@@ -41,11 +40,12 @@ public class ActiveProfile extends AndroidViewModel {
 
         mDatabase = AppDatabase.getInstance(application);
 
+        mAllProfiles = mDatabase.profileDao().getProfiles();
         mActive = new MutableLiveData<>();
-        mProfiles = mDatabase.profileDao().getProfiles();
+
 
         mActiveProfiles = new MediatorLiveData<>();
-        mActiveProfiles.addSource(mProfiles, new Observer<List<Profile>>() {
+        mActiveProfiles.addSource(mAllProfiles, new Observer<List<Profile>>() {
             @Override
             public void onChanged(@Nullable List<Profile> profiles) {
                 if (profiles == null) {
@@ -87,7 +87,7 @@ public class ActiveProfile extends AndroidViewModel {
     }
 
     public LiveData<List<Profile>> getProfiles() {
-        return mProfiles;
+        return mAllProfiles;
     }
 
     public MediatorLiveData<List<Profile>> getActiveProfiles() {

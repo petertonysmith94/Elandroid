@@ -1,6 +1,5 @@
 package com.elan_droid.elandroid.ui.generic;
 
-import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
@@ -8,7 +7,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -16,7 +14,7 @@ import android.util.Log;
 
 import com.elan_droid.elandroid.R;
 import com.elan_droid.elandroid.database.relation.Profile;
-import com.elan_droid.elandroid.database.view.ActiveProfile;
+import com.elan_droid.elandroid.database.view_model.ActiveProfile;
 import com.elan_droid.elandroid.ui.callback.UpdateDialogListener;
 import com.elan_droid.elandroid.ui.profile.ProfileActivity;
 
@@ -28,7 +26,7 @@ public abstract class BaseActivity extends AppCompatActivity implements UpdateDi
 
     private Profile mActiveProfile;
 
-    // Dialog request codes
+    // Dialog executeRequest codes
     public static final int NEW_PAGE_REQUEST_CODE = 0;
     public static final int NEW_PAGE_ITEM_REQUEST_CODE = 1;
     public static final int MANAGE_PROFILE_REQUEST_CODE = 3;
@@ -105,6 +103,14 @@ public abstract class BaseActivity extends AppCompatActivity implements UpdateDi
         }
 
         fragment.show(this.getSupportFragmentManager(), DIALOG_FRAGMENT_TAG);
+    }
+
+    public void dismissDialog () {
+        Fragment fragment = getSupportFragmentManager().findFragmentByTag(DIALOG_FRAGMENT_TAG);
+
+        if (fragment != null) {
+            ((DialogFragment) fragment).dismiss();
+        }
     }
 
 }

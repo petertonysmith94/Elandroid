@@ -73,7 +73,7 @@ public class LotusElanS2 implements PrepopulateModel {
         }
 
         private static final Parameter[] PARAMETERS = {
-                new ParameterFormatted(MESSAGE_ID, "PROM_ID", "Prom ID", 0, 2, Parameter.MULTIPLIER_DEFAULT, Parameter.OFFSET_DEFAULT, "%u", Parameter.UNIT_NONE, false),
+                new ParameterFormatted(MESSAGE_ID, "PROM_ID", "Prom ID", 0, 2, Parameter.MULTIPLIER_DEFAULT, Parameter.OFFSET_DEFAULT, "%d", Parameter.UNIT_NONE, false),
                 new ParameterBitwise8(MESSAGE_ID, "FAULTS_1", "Faults", 2, "VSS", "MAT low", "TPS low", "TPS high", "CTS low", "CTS high", "Oxygen sensor", "No ref. pulses"),
                 new ParameterBitwise8(MESSAGE_ID, "FAULTS_2", "Faults", 3, new String[]{"EST monitor error", "CAS fault", "IAC error", "MAP low", "MAP high", "EGR", "Wastegate overboost", "MAT high"}),
                 new ParameterBitwise8(MESSAGE_ID, "FAULTS_3", "Faults", 4, new String[]{"ADV error", "CO pot circuit", "High battery voltage", "Fuel injector circuit", "PROM error", "Oxygen sensor rich", "Oxygen sensor lean", "ESC failure"}),
@@ -88,17 +88,17 @@ public class LotusElanS2 implements PrepopulateModel {
                 new ParameterFormatted(MESSAGE_ID, "SPARK_ADVANCE", "Spark advance", 14, 2, 0.351562, Parameter.OFFSET_DEFAULT, "%5.1f", Parameter.UNIT_DEGREES, true),  //SIGNED
                 new ParameterFormatted(MESSAGE_ID, "SPEED", "Speed", 16, 1, Parameter.MULTIPLIER_DEFAULT, Parameter.OFFSET_DEFAULT, "%5.1f", Parameter.UNIT_MPH, false),
                 new ParameterFormatted(MESSAGE_ID, "CO_POTENTIOMETER", "CO potentiometer", 17, 1, 0.019608, Parameter.OFFSET_DEFAULT, "%5.1f", Parameter.UNIT_VOLTS, false), //TO BE DETERMINTED
-                new ParameterFormatted(MESSAGE_ID, "OXYGEN_SENSOR", "Oxygen sensor (integrator)", 18, 1, Parameter.MULTIPLIER_DEFAULT, Parameter.OFFSET_DEFAULT, "%x", Parameter.UNIT_NONE, false),
+                new ParameterFormatted(MESSAGE_ID, "OXYGEN_SENSOR", "Oxygen sensor (integrator)", 18, 1, Parameter.MULTIPLIER_DEFAULT, Parameter.OFFSET_DEFAULT, "%d", Parameter.UNIT_NONE, false),
                 new ParameterBitwise8(MESSAGE_ID, "FLAG_20", "Flag 20", 19, new String[] { ParameterBitwise8.BIT_1, ParameterBitwise8.BIT_2, ParameterBitwise8.BIT_3, ParameterBitwise8.BIT_4, ParameterBitwise8.BIT_5, ParameterBitwise8.BIT_6, ParameterBitwise8.BIT_7, ParameterBitwise8.BIT_8 }),
                 new ParameterFormatted(MESSAGE_ID, "IAC_POSITION", "IAC position", 20, 1, Parameter.MULTIPLIER_DEFAULT, Parameter.OFFSET_DEFAULT, "%5.1f", Parameter.UNIT_NONE, false),
-                new ParameterFormatted(MESSAGE_ID, "TARGET_IDLE", "Target idle", 21, 1, 12.5, Parameter.OFFSET_DEFAULT, "%5.1f", Parameter.UNIT_RPM, false),
+                new ParameterFormatted(MESSAGE_ID, "TARGET_IDLE", "Target idleTimeout", 21, 1, 12.5, Parameter.OFFSET_DEFAULT, "%5.1f", Parameter.UNIT_RPM, false),
                 new ParameterFormatted(MESSAGE_ID, "BAROMETER", "Barometer", 22, 1, 0.00781, 0.08, "%5.2f", Parameter.UNIT_BAR, false),
                 new ParameterFormatted(MESSAGE_ID, "MANIFOLD_PRESSURE_ABS", "Manifold press (ABS)", 23, 1, 0.00781, 0.08, "%5.2f", Parameter.UNIT_BAR, false),
                 new ParameterFormatted(MESSAGE_ID, "FLAG_25", "Flag 25", 24, 1, Parameter.MULTIPLIER_DEFAULT, Parameter.OFFSET_DEFAULT, "%5.1f", Parameter.UNIT_NONE, false),
                 new ParameterFormatted(MESSAGE_ID, "BATTERY_VOLTAGE", "Battery voltage", 25, 1, 0.1, Parameter.OFFSET_DEFAULT, "%5.1f", Parameter.UNIT_VOLTS, false),
                 new ParameterFormatted(MESSAGE_ID, "INJECTOR_PULSE_WIDTH", "Injector pulse width", 26, 2, 0.007629, Parameter.OFFSET_DEFAULT, "%5.1f", Parameter.UNIT_MSEC, false),
-                new ParameterFormatted(MESSAGE_ID, "OXYGEN_SENSOR_INTEGRATOR", "Oxygen sensor (integrator)", 28, 1, Parameter.MULTIPLIER_DEFAULT, Parameter.OFFSET_DEFAULT, "%x", Parameter.UNIT_NONE, false),
-                new ParameterBitwise8(MESSAGE_ID, "FLAG_30", "Flag 30", 29, new String[] { "Throttle > 0", ParameterBitwise8.BIT_2, ParameterBitwise8.BIT_3, ParameterBitwise8.BIT_4, "Throttle = 0", ParameterBitwise8.BIT_6, ParameterBitwise8.BIT_7, "At idle"}),
+                new ParameterFormatted(MESSAGE_ID, "OXYGEN_SENSOR_INTEGRATOR", "Oxygen sensor (integrator)", 28, 1, Parameter.MULTIPLIER_DEFAULT, Parameter.OFFSET_DEFAULT, "%d", Parameter.UNIT_NONE, false),
+                new ParameterBitwise8(MESSAGE_ID, "FLAG_30", "Flag 30", 29, new String[] { "Throttle > 0", ParameterBitwise8.BIT_2, ParameterBitwise8.BIT_3, ParameterBitwise8.BIT_4, "Throttle = 0", ParameterBitwise8.BIT_6, ParameterBitwise8.BIT_7, "At idleTimeout"}),
                 new ParameterFormatted(MESSAGE_ID, "ENGINE_RUN_TIME", "Engine run time", 30, 2, Parameter.MULTIPLIER_DEFAULT, Parameter.OFFSET_DEFAULT, "%5.1f", Parameter.UNIT_SECONDS, false),
                 new ParameterFormatted(MESSAGE_ID, "AIR_FUEL_RATIO", "Air/fuel ratio", 32, 1, 0.1, Parameter.OFFSET_DEFAULT, "%5.1f", Parameter.UNIT_NONE, false),
                 new ParameterBitwise8(MESSAGE_ID, "FLAG_34", "Flag 34", 33, new String[] { ParameterBitwise8.BIT_1, ParameterBitwise8.BIT_2, ParameterBitwise8.BIT_3, ParameterBitwise8.BIT_4, ParameterBitwise8.BIT_5, ParameterBitwise8.BIT_6, ParameterBitwise8.BIT_7, ParameterBitwise8.BIT_8 }),

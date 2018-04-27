@@ -12,7 +12,7 @@
         android:id="@+id/device_list_fragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        class="com.elan_droid.elandroid.ui.bluetooth.DeviceList" />
+        class="com.elan_droid.elandroid.ui.bluetooth.DeviceListFragment" />
 
 
 </FrameLayout>

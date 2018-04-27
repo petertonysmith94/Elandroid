@@ -1,4 +1,4 @@
-package com.elan_droid.elandroid.database.view;
+package com.elan_droid.elandroid.database.view_model;
 
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
@@ -6,13 +6,10 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import com.elan_droid.elandroid.database.AppDatabase;
-import com.elan_droid.elandroid.database.entity.Page;
 import com.elan_droid.elandroid.database.entity.Trip;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -222,8 +219,8 @@ public class TripModel extends AndroidViewModel {
 
         @Override
         protected Boolean doInBackground(Trip... params) {
-            if (params.length > 0) {
-                mmDatabase.tripDao().delete(params);
+            if (params.length > 0 && params[0] != null) {
+                mmDatabase.tripDao().delete(params[0]);
                 return true;
             }
             return false;
