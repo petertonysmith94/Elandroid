@@ -70,6 +70,10 @@ public class ProfileEdit extends Fragment implements ActiveProfile.FetchActivePr
         mUserVehicleId = bundle.getLong(ProfileActivity.EXTRA_USER_VEHICLE_ID, 0);
     }
 
+    /**
+     *
+     * @return
+     */
     private boolean parseAndSave() {
         String name = mNameEditText.getText().toString();
         if (name.equals("")) {
