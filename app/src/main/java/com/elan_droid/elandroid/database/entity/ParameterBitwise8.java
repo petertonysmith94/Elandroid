@@ -9,7 +9,7 @@ import android.view.View;
 
 import com.elan_droid.elandroid.database.converter.StringArrayConverter;
 import com.elan_droid.elandroid.database.relation.ParameterFlag;
-import com.elan_droid.elandroid.ui.page.ListPage;
+import com.elan_droid.elandroid.ui.dashboard.page.ListPage;
 import com.elan_droid.elandroid.ui.widget.Widget;
 
 import static android.arch.persistence.room.ForeignKey.CASCADE;

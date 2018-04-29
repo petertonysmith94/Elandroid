@@ -1,4 +1,4 @@
-package com.elan_droid.elandroid.database.model;
+package com.elan_droid.elandroid.database.prepopulate;
 
 import com.elan_droid.elandroid.database.embedded.Request;
 import com.elan_droid.elandroid.database.embedded.Response;
@@ -51,8 +51,10 @@ public class LotusElanS2 implements PrepopulateModel {
         };
 
         private static final int RAW_LENGTH = 71;
-        private static final int PAYLOAD_OFFSET = 7;
-        private static final int PAYLOAD_LENGTH = 63;
+        private static final int VALIDATE_FROM = 0;
+        private static final int VALIDATE_TO = 66;
+        private static final int PAYLOAD_FROM = 7;
+        private static final int PAYLOAD_TO = 70;
 
 
         private static DiagnosticMessage MESSAGE = new DiagnosticMessage();
@@ -64,7 +66,7 @@ public class LotusElanS2 implements PrepopulateModel {
         private static class DiagnosticMessage extends Message {
 
             private static final Request REQUEST = new Request(TRIGGER);
-            private static final Response RESPONSE = new Response(RAW_LENGTH, PAYLOAD_OFFSET, PAYLOAD_LENGTH);
+            private static final Response RESPONSE = new Response(RAW_LENGTH, VALIDATE_FROM, VALIDATE_TO, PAYLOAD_FROM, PAYLOAD_TO);
 
             public DiagnosticMessage() {
                 super(MESSAGE_ID, VEHICLE_ID, REQUEST, RESPONSE);

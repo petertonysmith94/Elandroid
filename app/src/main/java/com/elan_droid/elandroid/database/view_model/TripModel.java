@@ -119,7 +119,7 @@ public class TripModel extends AndroidViewModel {
             Trip result = (params.length > 0) ? params[0] : null;
 
             if (result != null) {
-                long tripId = mmDatabase.tripDao().insert(params[0]);
+                long tripId = mmDatabase.tripDao().baseInsert(params[0]);
 
                 if (tripId != -1) {
                     result.setId(tripId);
@@ -220,7 +220,7 @@ public class TripModel extends AndroidViewModel {
         @Override
         protected Boolean doInBackground(Trip... params) {
             if (params.length > 0 && params[0] != null) {
-                mmDatabase.tripDao().delete(params[0]);
+                mmDatabase.tripDao().baseDelete(params[0]);
                 return true;
             }
             return false;

@@ -176,10 +176,10 @@ public class LoggingManager extends BaseManager {
             Flag[] flags;
 
             while (running) {
-                final long packetId = database.packetDao().insert(new Packet(trip.getId()));
+                final long packetId = database.packetDao().baseInsert(new Packet(trip.getId()));
 
                 flags = response.format(packetId, debugResponse);
-                database.flagDao().insert (flags);
+                database.flagDao().baseInsert (flags);
 
                 try {
                     sleep(TIMEOUT_MS);

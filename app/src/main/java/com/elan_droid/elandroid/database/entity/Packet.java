@@ -108,8 +108,18 @@ public class Packet {
         return flags;
     }
 
+    public Flag[] getFlagArray() {
+        Flag[] result = new Flag[flags.size()];
+        flags.toArray(result);
+        return result;
+    }
+
     public void setFlags(List<Flag> flags) {
         this.flags = flags;
+    }
+
+    public void clearFlags() {
+        flags.clear();
     }
 
     public void addFlag(Flag flag) {

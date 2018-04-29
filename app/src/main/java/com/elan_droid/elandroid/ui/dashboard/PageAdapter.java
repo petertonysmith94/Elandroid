@@ -7,7 +7,7 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 
 import com.elan_droid.elandroid.database.entity.Page;
 import com.elan_droid.elandroid.database.relation.DetailedPage;
-import com.elan_droid.elandroid.ui.page.ListPage;
+import com.elan_droid.elandroid.ui.dashboard.page.ListPage;
 
 import java.util.ArrayList;
 import java.util.List;

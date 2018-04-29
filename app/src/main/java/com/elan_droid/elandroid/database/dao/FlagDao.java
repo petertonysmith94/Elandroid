@@ -9,6 +9,7 @@ import android.support.annotation.Nullable;
 
 import com.elan_droid.elandroid.database.entity.Flag;
 import com.elan_droid.elandroid.database.entity.FlagFormatted;
+import com.elan_droid.elandroid.database.entity.Packet;
 import com.elan_droid.elandroid.database.entity.Parameter;
 import com.elan_droid.elandroid.database.entity.ParameterBitwise8;
 import com.elan_droid.elandroid.database.entity.ParameterFormatted;
@@ -20,7 +21,17 @@ import java.util.List;
  * Created by Peter Smith on 4/23/2018.
  */
 @Dao
-public abstract class FlagDao implements FlagFormattedDao {
+public abstract class FlagDao extends FlagFormattedDao {
+
+    @Transaction
+    public boolean insert (Packet packet) {
+        if (packet != null) {
+            insert(packet.getFlagArray());
+            return true;
+        }
+        return false;
+    }
+
 
     @Transaction
     public List<Flag> fetchFlags (long packetId) {

@@ -123,7 +123,7 @@ public class ProfileEdit extends Fragment implements ActiveProfile.FetchActivePr
 
     private AlertDialog deleteProfile() {
         AlertDialog dialog = new AlertDialog.Builder(getActivity())
-        .setMessage("Are you sure you want to delete this profile?")
+        .setMessage("Are you sure you want to baseDelete this profile?")
         .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {

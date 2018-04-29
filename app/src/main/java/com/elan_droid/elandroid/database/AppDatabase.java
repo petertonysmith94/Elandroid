@@ -10,7 +10,6 @@ import android.support.annotation.NonNull;
 
 import com.elan_droid.elandroid.database.dao.CommandDao;
 import com.elan_droid.elandroid.database.dao.FlagDao;
-import com.elan_droid.elandroid.database.dao.MessageDao;
 import com.elan_droid.elandroid.database.dao.PacketDao;
 import com.elan_droid.elandroid.database.dao.PacketFlagDao;
 import com.elan_droid.elandroid.database.dao.PageDao;
@@ -30,9 +29,8 @@ import com.elan_droid.elandroid.database.entity.ParameterBitwise8;
 import com.elan_droid.elandroid.database.entity.Trip;
 import com.elan_droid.elandroid.database.entity.User;
 import com.elan_droid.elandroid.database.entity.Vehicle;
-import com.elan_droid.elandroid.database.model.LotusElanS2;
-import com.elan_droid.elandroid.database.model.PrepopulateModel;
-import com.elan_droid.elandroid.database.relation.Command;
+import com.elan_droid.elandroid.database.prepopulate.LotusElanS2;
+import com.elan_droid.elandroid.database.prepopulate.PrepopulateModel;
 
 import java.util.concurrent.Executors;
 
@@ -83,12 +81,8 @@ public abstract class AppDatabase extends RoomDatabase {
                             AppDatabase database = getInstance(context);
 
                             for (PrepopulateModel model : MODELS) {
-                                database.vehicleDao().insert(model.getVehicle());
-
-                                for (Command c : model.getCommands()) {
-                                    database.messageDao().insert(c.getMessage());
-                                    database.parameterDao().insert(c.getParametersArray());
-                                }
+                                database.vehicleDao().baseInsert(model.getVehicle());
+                                database.commandDao().insertCommands(model.getCommands());
                             }
                         }
                     });
@@ -112,8 +106,6 @@ public abstract class AppDatabase extends RoomDatabase {
     public abstract VehicleDao vehicleDao();
 
     public abstract UserDao userVehicleDao();
-
-    public abstract MessageDao messageDao();
 
     public abstract PageDao pageDao();
 

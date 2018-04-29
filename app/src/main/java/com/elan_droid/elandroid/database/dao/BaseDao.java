@@ -10,15 +10,12 @@ import android.arch.persistence.room.Insert;
 public interface BaseDao<T> {
 
     @Insert
-    long insert (T element);
+    public abstract long baseInsert(T element);
 
     @Insert
-    void insertAll (T... elements);
+    public abstract void baseInsertAll (T... elements);
 
     @Delete
-    void delete (T element);
-
-    @Delete
-    void delete (T... elements);
+    public abstract void baseDelete(T... elements);
 
 }

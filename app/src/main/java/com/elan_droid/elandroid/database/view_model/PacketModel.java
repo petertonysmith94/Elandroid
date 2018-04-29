@@ -53,7 +53,7 @@ public class PacketModel extends AndroidViewModel {
             Packet result = (params.length > 0) ? params[0] : null;
 
             if (result != null) {
-                long id = mmDatabase.packetDao().insert(result);
+                long id = mmDatabase.packetDao().baseInsert(result);
 
                 if (id != 0) {
                     result.setId(id);

@@ -235,10 +235,14 @@ public abstract class ServiceActivity extends NavigationActivity implements Devi
         switch (msg.arg1) {
             case BaseService.LOGGING_STATE_STARTED:
                 setConnectionStatus(ConnectionStatus.LOGGING);
+
+                mTripModel.setTrip((Trip) msg.obj);
                 break;
 
             case BaseService.LOGGING_STATE_STOPPED:
                 setConnectionStatus(ConnectionStatus.CONNECTED);
+
+                mTripModel.setTrip(null);
                 break;
         }
     }

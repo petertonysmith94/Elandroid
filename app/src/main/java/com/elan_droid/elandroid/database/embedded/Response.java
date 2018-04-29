@@ -3,7 +3,6 @@ package com.elan_droid.elandroid.database.embedded;
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Ignore;
 
-import com.elan_droid.elandroid.database.entity.Flag;
 import com.elan_droid.elandroid.database.entity.Packet;
 import com.elan_droid.elandroid.database.entity.ParameterStream;
 
@@ -17,41 +16,76 @@ import java.util.List;
 public class Response {
 
     public final static String COLUMN_RESPONSE_LENGTH = "raw_length";
-    public final static String COLUMN_PAYLOAD_OFFSET = "payload_offset";
-    public final static String COLUMN_PAYLOAD_LENGTH = "payload_length";
+    public final static String COLUMN_VALIDATE_FROM = "validate_from";
+    public final static String COLUMN_VALIDATE_TO = "validate_to";
+    public final static String COLUMN_PAYLOAD_FROM = "payload_from";
+    public final static String COLUMN_PAYLOAD_TO = "payload_to";
 
     @ColumnInfo(name = COLUMN_RESPONSE_LENGTH, typeAffinity = ColumnInfo.INTEGER)
     private int rawLength;
 
-    @ColumnInfo(name = COLUMN_PAYLOAD_OFFSET, typeAffinity = ColumnInfo.INTEGER)
-    private int payloadOffset;
+    @ColumnInfo(name = COLUMN_VALIDATE_FROM, typeAffinity = ColumnInfo.INTEGER)
+    private int validateFrom;
 
-    @ColumnInfo(name = COLUMN_PAYLOAD_LENGTH, typeAffinity = ColumnInfo.INTEGER)
-    private int payloadLength;
+    @ColumnInfo(name = COLUMN_VALIDATE_TO, typeAffinity = ColumnInfo.INTEGER)
+    private int validateTo;
+
+    @ColumnInfo(name = COLUMN_PAYLOAD_FROM, typeAffinity = ColumnInfo.INTEGER)
+    private int payloadFrom;
+
+    @ColumnInfo(name = COLUMN_PAYLOAD_TO, typeAffinity = ColumnInfo.INTEGER)
+    private int payloadTo;
+
+    @Ignore
+    private final int payloadLength;
 
     @Ignore
     private List<ParameterStream> streamParameters;
 
-    public Response (int rawLength, int payloadOffset, int payloadLength) {
+    public Response (int rawLength, int validateFrom, int validateTo, int payloadFrom, int payloadTo) {
         this.rawLength = rawLength;
-        this.payloadOffset = payloadOffset;
-        this.payloadLength = payloadLength;
+        this.validateFrom = validateFrom;
+        this.validateTo = validateTo;
+        this.payloadFrom = payloadFrom;
+        this.payloadTo = payloadTo;
+        this.payloadLength = payloadTo - payloadFrom;
         this.streamParameters = new ArrayList<>();
     }
 
     public boolean validate (byte[] data) {
-        return true;
+        return data.length == rawLength && checksum(data);
     }
 
+    private boolean checksum (byte[] data) {
+        //data = Arrays.copyOfRange(data, validateFrom, validateTo);
+        byte checksum = 0x00;
+
+        for (byte d : data) {
+            checksum += d;
+        }
+        return checksum == 0;
+    }
+
+
+    public byte[] stripPayload (byte[] payload) {
+        byte[] result = payload;
+        if (payload.length == rawLength) {
+            result = Arrays.copyOfRange (payload, payloadFrom, payloadTo);
+        }
+        return result.length == payloadLength ? result : null;
+    }
+
+
     public Packet format(Packet packet) {
-        final byte[] raw = packet.getData();
-        byte[] tmp;
+        packet.clearFlags();
 
         for (ParameterStream sp : streamParameters) {
-            tmp = Arrays.copyOfRange(raw, sp.getPosition(), sp.getPosition() + sp.getLength());
-            sp.format(packet, tmp);
+            sp.format(packet,
+                Arrays.copyOfRange(
+                    packet.getData(), sp.getPosition(), sp.getPosition() + sp.getLength()
+                )
+            );
         }
-
         return packet;
     }
 
@@ -63,20 +97,36 @@ public class Response {
         this.rawLength = rawLength;
     }
 
-    public int getPayloadOffset() {
-        return payloadOffset;
+    public int getValidateFrom() {
+        return validateFrom;
     }
 
-    public void setPayloadOffset(int payloadOffset) {
-        this.payloadOffset = payloadOffset;
+    public void setValidateFrom(int validateFrom) {
+        this.validateFrom = validateFrom;
     }
 
-    public int getPayloadLength() {
-        return payloadLength;
+    public int getValidateTo() {
+        return validateTo;
     }
 
-    public void setPayloadLength(int payloadLength) {
-        this.payloadLength = payloadLength;
+    public void setValidateTo(int validateTo) {
+        this.validateTo = validateTo;
+    }
+
+    public int getPayloadFrom() {
+        return payloadFrom;
+    }
+
+    public void setPayloadFrom(int payloadFrom) {
+        this.payloadFrom = payloadFrom;
+    }
+
+    public int getPayloadTo() {
+        return payloadTo;
+    }
+
+    public void setPayloadTo(int payloadTo) {
+        this.payloadTo = payloadTo;
     }
 
     public List<ParameterStream> getStreamParameters() {

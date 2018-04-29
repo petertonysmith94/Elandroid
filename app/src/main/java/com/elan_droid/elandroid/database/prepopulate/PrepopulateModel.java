@@ -1,12 +1,7 @@
-package com.elan_droid.elandroid.database.model;
+package com.elan_droid.elandroid.database.prepopulate;
 
-import com.elan_droid.elandroid.database.dao.MessageDao;
-import com.elan_droid.elandroid.database.dao.ParameterDao;
-import com.elan_droid.elandroid.database.entity.Message;
 import com.elan_droid.elandroid.database.entity.Vehicle;
 import com.elan_droid.elandroid.database.relation.Command;
-
-import java.util.List;
 
 /**
  * Created by Peter Smith

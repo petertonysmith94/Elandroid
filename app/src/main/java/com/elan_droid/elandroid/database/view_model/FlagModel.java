@@ -22,15 +22,21 @@ public class FlagModel extends AndroidViewModel {
 
     }
 
+    public interface OnFetchFlagListener {
+        void onFetchFlags (List<Flag> flags);
+    }
+
     /**
      *
      */
     public static class FetchFlagsTask extends AsyncTask<Long, Void, List<Flag>> {
 
         private AppDatabase mmDatabase;
+        private OnFetchFlagListener mmListener;
 
-        FetchFlagsTask(AppDatabase database) {
+        FetchFlagsTask(@NonNull AppDatabase database, @NonNull OnFetchFlagListener listener) {
             this.mmDatabase = database;
+            this.mmListener = listener;
         }
 
         @Override
@@ -44,7 +50,7 @@ public class FlagModel extends AndroidViewModel {
 
         @Override
         protected void onPostExecute(List<Flag> flags) {
-
+            mmListener.onFetchFlags(flags);
         }
     }
 }

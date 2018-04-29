@@ -83,7 +83,7 @@ public class PageModel extends PageItemModel {
         protected Page doInBackground(Page... params) {
             if(params.length > 0) {
                 final Page page = params[0];
-                final long id = mmDatabase.pageDao().insert(page);
+                final long id = mmDatabase.pageDao().baseInsert(page);
                 if (id != 0) {
                     page.setId(id);
                     return page;
@@ -132,7 +132,7 @@ public class PageModel extends PageItemModel {
 
             if(params.length > 0) {
                 result = params[0];
-                final long id = mmDatabase.pageItemDao().insert(result);
+                final long id = mmDatabase.pageItemDao().baseInsert(result);
 
                 if (id != 0) {
                     result.setId(id);

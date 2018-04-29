@@ -29,11 +29,8 @@ public class ActiveTrip extends AndroidViewModel {
     private PacketModel packetModel;
 
     private final MutableLiveData<Trip> trip;
-
-    private final MediatorLiveData<Packet> latestPacketWithFlags;
-
     private final LiveData<Packet> latestPacket;
-
+    private final MediatorLiveData<List<Flag>> latestFlags;
 
     private final LiveData<Integer> packetCount;
 
@@ -43,44 +40,34 @@ public class ActiveTrip extends AndroidViewModel {
 
         this.database = AppDatabase.getInstance(application);
         this.trip = new MutableLiveData<>();
-        this.latestPacket = Transformations.switchMap(this.trip, new Function<Trip, LiveData<Packet>>() {
+        this.latestPacket = Transformations.switchMap(trip, new Function<Trip, LiveData<Packet>>() {
             @Override
-            public LiveData<Packet> apply(Trip trip) {
-                LiveData<Packet> output = null;
-
-                if (trip != null) {
-                    output = database.packetDao().getLatestPacket(trip.getId());
-                }
-
-                return output;
+            public LiveData<Packet> apply(Trip input) {
+                return database.packetDao().getLatest(input.getId());
             }
         });
-
-        latestPacketWithFlags = new MediatorLiveData<>();
-        latestPacketWithFlags.addSource(this.latestPacket, new Observer<Packet>() {
+        this.latestFlags = new MediatorLiveData<>();
+        latestFlags.addSource(latestPacket, new Observer<Packet>() {
             @Override
-            public void onChanged(@Nullable final Packet packet) {
+            public void onChanged(@Nullable Packet packet) {
                 if (packet != null) {
-                    new FlagModel.FetchFlagsTask(database) {
+                    new FlagModel.FetchFlagsTask(database, new FlagModel.OnFetchFlagListener() {
                         @Override
-                        protected void onPostExecute(List<Flag> flags) {
-                            packet.setFlags(flags);
-                            latestPacketWithFlags.postValue(packet);
+                        public void onFetchFlags(List<Flag> flags) {
+                            latestFlags.postValue(flags);
                         }
-                    }.execute(packet.getId());
+                    }).execute(packet.getId());
                 }
             }
         });
 
-
-        this.packetCount = Transformations.switchMap(this.trip, new Function<Trip, LiveData<Integer>>() {
+        this.packetCount = Transformations.switchMap(trip, new Function<Trip, LiveData<Integer>>() {
             @Override
             public LiveData<Integer> apply(Trip trip) {
                 return trip == null ? null : database.packetDao().getCount(trip.getId());
             }
         });
     }
-
 
 
     public LiveData<Trip> getActiveTrip() {
@@ -92,8 +79,8 @@ public class ActiveTrip extends AndroidViewModel {
     }
 
 
-    public LiveData<Packet> getLatest() {
-        return latestPacketWithFlags;
+    public LiveData<List<Flag>> getLatestFlags() {
+        return latestFlags;
     }
 
     public LiveData<Integer> getPacketCount() {

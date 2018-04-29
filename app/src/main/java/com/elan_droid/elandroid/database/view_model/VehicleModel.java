@@ -67,7 +67,7 @@ public class VehicleModel extends AndroidViewModel {
         @Override
         protected Void doInBackground(Vehicle... params) {
             if(params.length > 0) {
-                mmDatabase.vehicleDao().insertAll(params);
+                mmDatabase.vehicleDao().baseInsert(params[0]);
             }
             return null;
         }

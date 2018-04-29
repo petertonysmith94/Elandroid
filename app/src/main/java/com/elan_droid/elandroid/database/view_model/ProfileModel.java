@@ -153,7 +153,7 @@ public class ProfileModel extends AndroidViewModel {
 
             if (params.length > 0 && params[0] != null) {
                 id = params[0].getProfileId();
-                mmDatabase.userVehicleDao().delete(params[0].getUser());
+                mmDatabase.userVehicleDao().baseDelete(params[0].getUser());
 
                 if (params[0].isActive()) {
                     id = mmDatabase.userVehicleDao().fetchOne();
@@ -214,7 +214,7 @@ public class ProfileModel extends AndroidViewModel {
         protected Profile doInBackground(String... params) {
             if(params.length >= 4) {
                 final long vehicleId = mmDatabase.vehicleDao().getId(params[0], params[1]);
-                final long userId = mmDatabase.userVehicleDao().insert(new User(vehicleId, params[2], params[3]));
+                final long userId = mmDatabase.userVehicleDao().baseInsert(new User(vehicleId, params[2], params[3]));
                 return mmDatabase.profileDao().getProfile(userId);
             }
             return null;

@@ -114,7 +114,7 @@ public class BaseService extends Service {
 
     /**
      * Sends a message to all registered clients of the service.
-     * Will delete any clients which are unresponsive.
+     * Will baseDelete any clients which are unresponsive.
      * @param msg   the message in which to send
      */
     private void sendToClients(Message msg) {
@@ -176,7 +176,8 @@ public class BaseService extends Service {
         if (loggingManager != null) {
             loggingManager.stopAndSave("Latest trip");
         }
-        bluetoothManager.disconnect();
+        if (bluetoothManager != null)
+            bluetoothManager.disconnect();
     }
 
 
@@ -205,7 +206,7 @@ public class BaseService extends Service {
             sendToast("Unable to start trip, please try again");
         }
 
-        else if (trip.getId() == 0) {   // We need to insert the trip into the database
+        else if (trip.getId() == 0) {   // We need to baseInsert the trip into the database
             new TripModel.PopulateAsyncTask(database, new TripModel.InsertTripCallback() {
                 @Override
                 public void onTripInserted(Trip trip) {
@@ -250,18 +251,21 @@ public class BaseService extends Service {
 
         IOStrategy strategy = new LoggingStrategy(database, trip.getId(), command.getRequest(), command.getResponse());
         getBluetoothManager().setStrategy(strategy);
+
+        setLoggingState(LOGGING_STATE_STARTED);
+    }
+
+    private void setLoggingState (int state) {
+        Message msg = new Message();
+        msg.what = BaseService.MESSAGE_LOGGING_STATE_CHANGE;
+        msg.arg1 = state;
+        msg.obj = activeTrip;
+        sendToClients(msg);
     }
 
     private void stopLogging (String tripName) {
-        // We need to deleting the trip we just created
-        if (tripName == null) {
-            loggingManager.stopAndDelete();
-        }
-        // Otherwise we save it
-        else {
-            loggingManager.stopAndSave(tripName);
-        }
 
+        setLoggingState(BaseService.LOGGING_STATE_STOPPED);
     }
 
 

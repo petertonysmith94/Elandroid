@@ -15,23 +15,28 @@ import java.util.List;
  * Created by Peter Smith on 4/23/2018.
  **/
 
-interface FlagFormattedDao {
+abstract class FlagFormattedDao {
 
     @Query ("SELECT *" +
             " FROM " + FlagFormatted.TABLE_NAME +
             " WHERE " + Packet.REFERENCE_COLUMN_ID + " = :packetId")
-    List<FlagFormatted> fetchFormatted (long packetId);
+    public abstract LiveData<List<FlagFormatted>> fetchLatestFormatted (long packetId);
+
+    @Query ("SELECT *" +
+            " FROM " + FlagFormatted.TABLE_NAME +
+            " WHERE " + Packet.REFERENCE_COLUMN_ID + " = :packetId")
+    public abstract List<FlagFormatted> fetchFormatted (long packetId);
 
     @Insert
-    long insertFormatted (FlagFormatted element);
+    public abstract long insertFormatted (FlagFormatted element);
 
     @Insert
-    void insertFormatted (FlagFormatted... elements);
+    public abstract void insertFormatted (FlagFormatted... elements);
 
     @Delete
-    void deleteFormatted (FlagFormatted element);
+    public abstract void deleteFormatted (FlagFormatted element);
 
     @Delete
-    void deleteFormatted (FlagFormatted... elements);
+    public abstract void deleteFormatted (FlagFormatted... elements);
 
 }

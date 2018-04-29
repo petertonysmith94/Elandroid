@@ -1,4 +1,4 @@
-package com.elan_droid.elandroid.ui.page;
+package com.elan_droid.elandroid.ui.dashboard.page;
 
 import com.elan_droid.elandroid.database.entity.Trip;
 
@@ -17,8 +17,4 @@ public class WidgetPage extends BasePage {
 
     }
 
-    @Override
-    public void stopTrip() {
-
-    }
 }

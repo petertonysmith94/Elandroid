@@ -1,7 +1,6 @@
 package com.elan_droid.elandroid.database.entity;
 
 import android.arch.persistence.room.ColumnInfo;
-import android.arch.persistence.room.Database;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.Ignore;
@@ -10,7 +9,7 @@ import android.widget.TextView;
 
 import com.elan_droid.elandroid.R;
 import com.elan_droid.elandroid.database.relation.ParameterFlag;
-import com.elan_droid.elandroid.ui.page.ListPage;
+import com.elan_droid.elandroid.ui.dashboard.page.ListPage;
 import com.elan_droid.elandroid.ui.widget.Widget;
 
 import java.math.BigInteger;

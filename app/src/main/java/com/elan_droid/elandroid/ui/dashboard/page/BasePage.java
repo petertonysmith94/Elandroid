@@ -1,4 +1,4 @@
-package com.elan_droid.elandroid.ui.page;
+package com.elan_droid.elandroid.ui.dashboard.page;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
@@ -24,7 +24,6 @@ public abstract class BasePage extends Fragment {
         tripModel.getActiveTrip().observe(this, new Observer<Trip>() {
             @Override
             public void onChanged(@Nullable Trip trip) {
-                stopTrip();
                 startTrip(trip);
             }
         });
@@ -33,6 +32,5 @@ public abstract class BasePage extends Fragment {
 
     public abstract void startTrip (Trip trip);
 
-    public abstract void stopTrip ();
 
 }

@@ -323,33 +323,42 @@ public class BluetoothManager extends BaseManager {
             }
 
             int result = IOStrategy.RESULT_TRIGGER;
+            byte[] tmp = new byte[1024];
 
             while (state == BLUETOOTH_STATE_CONNECTED) {
-                while (mmRequestStrategy == null) {
-                    try {
-                        sleep(20);
-                    }
-                    catch (InterruptedException e) {
-                        Log.e(TAG, "ConnectedThread:run() failed to wait");
-                    }
-                }
-
                 try {
-                    if (result < 0) {
-                        result = mmRequestStrategy.executeRequest
-                                (IOStrategy.RESULT_TRIGGER, mmOutStream);
+                    while (mmRequestStrategy == null) {
+                        sleep(20);
+
+                        if (mmInStream != null && mmInStream.available() > 0) {
+                            mmInStream.skip(mmInStream.available());
+                        }
                     }
+
+                    /**
+                    if (result < 0) {
+                        sleep(100);
+
+                        if (mmInStream != null && mmInStream.available() > 0) {
+                            mmInStream.skip(mmInStream.available());
+                        }
+                        sleep(100);
+                        result = IOStrategy.RESULT_TRIGGER;
+                    }
+                     **/
+
+
 
                     if (result == IOStrategy.RESULT_TRIGGER) {
                         result = mmRequestStrategy.executeRequest(result, mmOutStream);
                     }
 
+                    sleep (mmRequestStrategy.idleTimeout());
+
                     if (result == IOStrategy.RESULT_TRIGGERED && mmHasResponse) {
                         result = mmResponseStrategy.executeResponse(result, mmInStream);
                         result = mmResponseStrategy.postResponse(result);
                     }
-
-                    sleep (mmRequestStrategy.idleTimeout());
                 }
                 catch (IOException e) {
                     Log.e(TAG, "ConnectedThread:run() failed to read bytes");

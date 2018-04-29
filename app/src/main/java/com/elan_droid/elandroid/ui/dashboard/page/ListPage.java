@@ -1,4 +1,4 @@
-package com.elan_droid.elandroid.ui.page;
+package com.elan_droid.elandroid.ui.dashboard.page;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
@@ -77,33 +77,23 @@ public class ListPage extends BasePage {
         parameterModel.fetchParameters(mPage.getPage().getMessageId(), new ParameterModel.FetchParameterCallback() {
             @Override
             public void onFetch(List<Parameter> parameters) {
-                updateParameters(parameters);
+                mAdapter.updateParameters(parameters);
             }
         });
     }
 
     @Override
     public void startTrip(Trip trip) {
-        tripModel.getLatest().observe(this, new Observer<Packet>() {
+        tripModel.getLatestFlags().removeObservers(this);
+        tripModel.getLatestFlags().observe(this, new Observer<List<Flag>>() {
             @Override
-            public void onChanged(@Nullable Packet packet) {
-                updatePacket(packet);
+            public void onChanged(@Nullable List<Flag> flags) {
+                mAdapter.updateFlags(flags);
             }
         });
     }
 
-    @Override
-    public void stopTrip() {
-        tripModel.getLatest().removeObservers(this);
-    }
 
-    private void updatePacket (Packet packet) {
-        mAdapter.update(packet);
-    }
-
-    private void updateParameters (List<Parameter> parameters) {
-        mAdapter.update(parameters);
-    }
 
     @Nullable
     @Override
@@ -142,10 +132,12 @@ public class ListPage extends BasePage {
             }
         }
 
-        public void updatePacket (@NonNull Packet packet) {
-            for (Flag flag : packet.getFlags()) {
-                if (parameterMap.containsKey(flag.getParameterId())) {
-                    parameterMap.get(flag.getParameterId()).setValue(flag.toString());
+        public void updateFlags (@Nullable List<Flag> flags) {
+            if (flags != null) {
+                for (Flag flag : flags) {
+                    if (parameterMap.containsKey(flag.getParameterId())) {
+                        parameterMap.get(flag.getParameterId()).setValue(flag.toString());
+                    }
                 }
             }
         }
@@ -164,13 +156,13 @@ public class ListPage extends BasePage {
             this.listener = listener;
         }
 
-        public void update (@NonNull List<Parameter> parameters) {
+        public void updateParameters (@NonNull List<Parameter> parameters) {
             this.parameters.updateParameters(parameters);
             notifyDataSetChanged();
         }
 
-        public void update (@NonNull Packet packet) {
-            this.parameters.updatePacket(packet);
+        public void updateFlags (@NonNull List<Flag> flags) {
+            this.parameters.updateFlags(flags);
             notifyDataSetChanged();
         }
 

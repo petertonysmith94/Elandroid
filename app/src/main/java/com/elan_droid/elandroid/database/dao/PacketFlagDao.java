@@ -12,8 +12,8 @@ import com.elan_droid.elandroid.database.entity.Packet;
  * Created by Peter Smith on 4/24/2018.
  **/
 @Dao
-public abstract class PacketFlagDao extends FlagDao implements PacketDao {
-
+public abstract class PacketFlagDao {
+/**
     @Transaction
     public LiveData<Packet> getLatestPacketWithFlags (long tripId) {
         return Transformations.map(getLatestPacket(tripId), new Function<Packet, Packet>() {
@@ -23,6 +23,18 @@ public abstract class PacketFlagDao extends FlagDao implements PacketDao {
                 return input;
             }
         });
+
     }
 
+    @Transaction
+    public Packet insertPacket (Packet packet) {
+        long packetId = baseInsert(packet);
+        if (packetId != 0) {
+            packet.setId(packetId);
+        }
+        else packet = null;
+
+        return packet;
+    }
+**/
 }
