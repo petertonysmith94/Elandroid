@@ -4,7 +4,10 @@ import android.bluetooth.BluetoothDevice;
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.view.View;
+
+import com.elan_droid.elandroid.R;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,21 +19,36 @@ import java.util.List;
 public class DeviceList extends BaseObservable {
 
     private List<DeviceItem> devices;
+    private boolean discovering;
 
-
-    DeviceList(@Nullable List<BluetoothDevice> devices) {
+    DeviceList() {
         this.devices = new ArrayList<>();
+        this.discovering = false;
+    }
 
-        if (devices != null) {
-            for (BluetoothDevice device : devices) {
-                this.devices.add(new DeviceItem(device));
-            }
-        }
+    @Bindable
+    public int getDiscoveryVisibility() {
+        return discovering ? View.VISIBLE : View.INVISIBLE;
+    }
+
+    @Bindable
+    public boolean getDiscovering () {
+        return discovering;
+    }
+
+    public void setDiscovering(boolean discovering) {
+        this.discovering = discovering;
+        notifyChange();
+    }
+
+    @Bindable
+    public boolean getNothing () {
+        return devices.size() == 0;
     }
 
     @Bindable
     public int getNothingVisibility() {
-        return devices.size() > 0 ? View.GONE : View.VISIBLE;
+        return !discovering && devices.size() == 0  ? View.VISIBLE : View.GONE;
     }
 
     @Bindable

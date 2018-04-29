@@ -3,7 +3,7 @@
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="@dimen/list_item_padding">
+    android:padding="@dimen/list_item_padding_large">
 
     <TextView
         android:id="@+id/list_item_bitwise_parameter_title"

@@ -66,11 +66,15 @@ public class Response {
         return checksum == 0;
     }
 
-
-    public byte[] stripPayload (byte[] payload) {
-        byte[] result = payload;
-        if (payload.length == rawLength) {
-            result = Arrays.copyOfRange (payload, payloadFrom, payloadTo);
+    /**
+     * Strips the
+     * @param rawBytes
+     * @return
+     */
+    public byte[] stripPayload (byte[] rawBytes) {
+        byte[] result = rawBytes;
+        if (result.length == rawLength) {
+            result = Arrays.copyOfRange (rawBytes, payloadFrom, payloadTo);
         }
         return result.length == payloadLength ? result : null;
     }

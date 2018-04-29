@@ -39,7 +39,7 @@ public abstract class BaseManager {
      * @param toast
      */
     protected void sendToast(String toast) {
-        Message msg = new Message();
+        Message msg = Message.obtain();
         msg.what = MESSAGE_TOAST;
         msg.obj = toast;
         send (msg);

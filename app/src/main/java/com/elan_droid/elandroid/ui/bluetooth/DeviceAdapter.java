@@ -2,6 +2,7 @@ package com.elan_droid.elandroid.ui.bluetooth;
 
 import android.bluetooth.BluetoothDevice;
 import android.databinding.DataBindingUtil;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -26,17 +27,19 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceItemHolder> {
     private DeviceList mDevices;
     private OnDeviceSelectedListener mListener;
 
-    public DeviceAdapter (@Nullable OnDeviceSelectedListener listener) {
-        this (null, listener);
-    }
 
-    public DeviceAdapter (@Nullable List<BluetoothDevice> devices, @Nullable OnDeviceSelectedListener listener) {
-        this.mDevices = new DeviceList(devices);
+    public DeviceAdapter (@NonNull DeviceList devices, @Nullable OnDeviceSelectedListener listener) {
+        this.mDevices = devices;
         this.mListener = listener;
     }
 
     public DeviceList getDevices() {
         return mDevices;
+    }
+
+    public void setDiscovery(boolean discovering) {
+        mDevices.setDiscovering(discovering);
+        notifyDataSetChanged();
     }
 
     /**

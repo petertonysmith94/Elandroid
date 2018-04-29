@@ -12,7 +12,9 @@ import android.support.annotation.Nullable;
 
 import com.elan_droid.elandroid.R;
 import com.elan_droid.elandroid.database.AppDatabase;
+import com.elan_droid.elandroid.database.entity.Page;
 import com.elan_droid.elandroid.database.entity.User;
+import com.elan_droid.elandroid.database.entity.Vehicle;
 import com.elan_droid.elandroid.database.relation.Profile;
 
 import java.util.ArrayList;
@@ -229,7 +231,7 @@ public class ActiveProfile extends AndroidViewModel {
      */
     public void newProfile (String name, String make, String model,
                             String registration, final boolean active, final InternalPopulateProfileCallback listener) {
-        new PopulateAsyncTask(getApplication(), mDatabase, new InternalPopulateProfileCallback() {
+        new PopulateAsyncTask(mDatabase, new InternalPopulateProfileCallback() {
             @Override
             public void onInsertion(Profile profile) {
                 if (active && profile != null) {
@@ -240,7 +242,6 @@ public class ActiveProfile extends AndroidViewModel {
                 }
             }
         }).execute(make, model, name, registration);
-
     }
 
     public interface InternalPopulateProfileCallback {
@@ -252,12 +253,10 @@ public class ActiveProfile extends AndroidViewModel {
      */
     private static class PopulateAsyncTask extends AsyncTask<String, Void, Profile> {
 
-        private Context mmContext;
         private AppDatabase mmDatabase;
         private InternalPopulateProfileCallback mmCallback;
 
-        PopulateAsyncTask (Context context, AppDatabase database, InternalPopulateProfileCallback callback) {
-            mmContext = context;
+        PopulateAsyncTask (AppDatabase database, InternalPopulateProfileCallback callback) {
             mmDatabase = database;
             mmCallback = callback;
         }
@@ -266,8 +265,12 @@ public class ActiveProfile extends AndroidViewModel {
         @Override
         protected Profile doInBackground(String... params) {
             if(params.length >= 4) {
-                final long vehicleId = mmDatabase.vehicleDao().getId(params[0], params[1]);
-                final long userId = mmDatabase.userVehicleDao().baseInsert(new User(vehicleId, params[2], params[3]));
+                final Vehicle vehicle = mmDatabase.vehicleDao().getVehicle(params[0], params[1]);
+                final long userId = mmDatabase.userVehicleDao().baseInsert(new User(vehicle.getId(), params[2], params[3]));
+
+                final Page page = new Page(userId, vehicle.getDefaultMessageId(), "Default");
+                mmDatabase.pageDao().baseInsert(page);
+
                 return mmDatabase.profileDao().getProfile(userId);
             }
             return null;

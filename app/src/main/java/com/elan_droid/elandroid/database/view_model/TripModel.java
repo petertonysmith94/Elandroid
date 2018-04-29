@@ -87,7 +87,7 @@ public class TripModel extends AndroidViewModel {
     }
 
     public void newTrip (final Trip trip, final InsertTripCallback callback) {
-        new PopulateAsyncTask(mDatabase, new InsertTripCallback() {
+        new InsertTripTask(mDatabase, new InsertTripCallback() {
             @Override
             public void onTripInserted(Trip trip) {
                 if (callback != null) {
@@ -105,11 +105,11 @@ public class TripModel extends AndroidViewModel {
         void onTripInserted (Trip trip);
     }
 
-    public static class PopulateAsyncTask extends AsyncTask<Trip, Void, Trip> {
+    public static class InsertTripTask extends AsyncTask<Trip, Void, Trip> {
         private AppDatabase mmDatabase;
         private InsertTripCallback mmCallback;
 
-        public PopulateAsyncTask(AppDatabase database, InsertTripCallback callback) {
+        public InsertTripTask(AppDatabase database, InsertTripCallback callback) {
             this.mmDatabase = database;
             this.mmCallback = callback;
         }
@@ -193,13 +193,14 @@ public class TripModel extends AndroidViewModel {
         protected Boolean doInBackground(Trip... params) {
             if (params.length > 0) {
                 mmDatabase.tripDao().update(params);
+                return true;
             }
-            return null;
+            return false;
         }
 
         @Override
-        protected void onPostExecute(Boolean aBoolean) {
-            super.onPostExecute(aBoolean);
+        protected void onPostExecute(Boolean result) {
+            mmCallback.onUpdate(result);
         }
     }
 
@@ -210,9 +211,9 @@ public class TripModel extends AndroidViewModel {
     public static class DeleteTripAsyncTask extends AsyncTask<Trip, Void, Boolean> {
 
         private AppDatabase mmDatabase;
-        private UpdateTripCallback mmCallback;
+        private DeleteTripCallback mmCallback;
 
-        public DeleteTripAsyncTask(AppDatabase database, UpdateTripCallback callback) {
+        public DeleteTripAsyncTask(AppDatabase database, DeleteTripCallback callback) {
             this.mmDatabase = database;
             this.mmCallback = callback;
         }
@@ -227,8 +228,8 @@ public class TripModel extends AndroidViewModel {
         }
 
         @Override
-        protected void onPostExecute(Boolean aBoolean) {
-            super.onPostExecute(aBoolean);
+        protected void onPostExecute(Boolean result) {
+            mmCallback.onDelete(result);
         }
     }
 

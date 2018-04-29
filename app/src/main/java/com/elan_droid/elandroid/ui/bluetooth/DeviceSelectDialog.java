@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -11,6 +12,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
@@ -27,12 +30,11 @@ import com.elan_droid.elandroid.R;
  * Created by Peter Smith
  */
 
-public class DeviceSelectDialog extends DialogFragment {
+public class DeviceSelectDialog extends DialogFragment implements DialogInterface.OnDismissListener {
 
-    private static final int REQUEST_ENABLE_BT = 0;
-    private static final int REQUEST_COURSE_LOCATION = 1;
+    private DeviceListFragment deviceListFragment;
 
-    private BluetoothAdapter mAdapter;
+    private DeviceListFragment.OnDiscoveringStateListener discoveryListener;
 
     public static DialogFragment getInstance() {
         DialogFragment dialog = new DeviceSelectDialog();
@@ -40,192 +42,117 @@ public class DeviceSelectDialog extends DialogFragment {
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public void onAttach(Context context) {
+        super.onAttach(context);
 
-        mAdapter = BluetoothAdapter.getDefaultAdapter();
-
-        // The device doesn't support Bluetooth
-        if (mAdapter == null) {
-
-        }
-
-        // Check that Bluetooth is enabled, if it isn't then launch enable intent
-        if (!mAdapter.isEnabled()) {
-            Intent btEnable = new Intent (BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivityForResult(btEnable, REQUEST_ENABLE_BT);
-        }
-
+        // Registers the broadcast intent for finding devices
         IntentFilter filter = new IntentFilter();
-        filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
         filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_STARTED);
-        getActivity().registerReceiver(mReceiver, filter);
+        filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
+        context.registerReceiver(mReceiver, filter);
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        if (getActivity() != null) {
+            deviceListFragment = (DeviceListFragment) getActivity()
+                    .getSupportFragmentManager().findFragmentById(R.id.device_list_fragment);
+            deviceListFragment.startDiscovery();
+        }
+    }
+
+    @Override
+    @NonNull
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+
+        View view = LayoutInflater.from(getContext())
+                .inflate(R.layout.dialog_device_search, null, false);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
+                .setTitle("Search for nearby devices")
+                .setView(view)
+                .setPositiveButton("Stop", null)
+                .setNeutralButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        deviceListFragment.stopDiscovery();
+                    }
+                })
+                .setOnDismissListener(this);
+
+        final AlertDialog dialog = builder.create();
+
+        discoveryListener = new DeviceListFragment.OnDiscoveringStateListener() {
+            @Override
+            public void onDiscoveryResult(String result) {
+                switch (result) {
+                    case BluetoothAdapter.ACTION_DISCOVERY_STARTED:
+                        dialog.getButton(DialogInterface.BUTTON_POSITIVE).setText("Stop");
+                        dialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                deviceListFragment.stopDiscovery();
+                            }
+                        });
+                        break;
+
+                    case BluetoothAdapter.ACTION_DISCOVERY_FINISHED:
+                        dialog.getButton(DialogInterface.BUTTON_POSITIVE).setText("Retry");
+                        dialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                deviceListFragment.startDiscovery();
+                            }
+                        });
+                        break;
+                }
+            }
+        };
+
+        return dialog;
+    }
+
+
+    @Override
+    public void onDismiss(DialogInterface dialog) {
+        super.onDismiss(dialog);
+
+        deviceListFragment.stopDiscovery();
+    }
+
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        // Unregisters the receiver
+        if (getContext() != null) {
+            getContext().unregisterReceiver(mReceiver);
+        }
+
+        //Destroys the deviceListFragment
+        if (deviceListFragment != null && getActivity() != null) {
+            getActivity().getSupportFragmentManager().beginTransaction()
+                    .remove(deviceListFragment).commit();
+        }
+    }
+
+    /**
+     * The broadcast receiver notifies the fragment of system broadcasts
+     */
+    @NonNull
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
+            final String action = intent.getAction();
 
-            switch (action) {
-                case BluetoothAdapter.ACTION_DISCOVERY_FINISHED:
-                    retryDialog();
-                    break;
-
-                case BluetoothAdapter.ACTION_DISCOVERY_STARTED:
-                    discoveringDialog();
-                    break;
+            if (discoveryListener != null && action != null) {
+                discoveryListener.onDiscoveryResult(action);
             }
         }
     };
-
-    @Override
-    public View onCreateView (LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = getActivity().getLayoutInflater().inflate(R.layout.dialog_device_search, null);
-
-
-        return view;
-    }
-
-
-    @Override
-    public Dialog onCreateDialog(Bundle savedInstanceState) {
-        return new AlertDialog.Builder(getContext())
-                .setPositiveButton(null, null)
-                .setNegativeButton(null, null)
-                .setView(getView())
-                .create();
-    }
-
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-        initialDialog();
-    }
-
-    /**
-     * Starts the process of discovering Bluetooth devices
-     */
-    private void startDiscovery () {
-        // Check we have granted permissions to discover devices
-        if (checkPermissions()) {
-            mAdapter.startDiscovery();
-        }
-    }
-
-    private void stopDiscovery () {
-        if (mAdapter.isDiscovering()) {
-            mAdapter.cancelDiscovery();
-        }
-    }
-
-    /**
-     * Checks that we have the necessary permissions
-     * @return
-     */
-    private boolean checkPermissions() {
-        if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(getActivity(),
-                    new String[] { Manifest.permission.ACCESS_COARSE_LOCATION },
-                    REQUEST_COURSE_LOCATION);
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        switch (requestCode) {
-            case REQUEST_COURSE_LOCATION:
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    // Restart discovery, we have permission
-                    startDiscovery();
-                }
-                break;
-        }
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-    }
-
-    private void setupDialog(String title, final String positiveText, final String negativeText,
-                             final View.OnClickListener positiveListener,
-                             final View.OnClickListener negativeListener) {
-        if (getDialog() != null) {
-            final AlertDialog dialog = (AlertDialog) getDialog();
-            //dialog.setOnShowListener(null);
-            dialog.setView (getView());
-
-            DialogInterface.OnClickListener listener = null;
-
-            dialog.setTitle(title);
-            dialog.setButton(DialogInterface.BUTTON_POSITIVE, positiveText, listener);
-            dialog.setButton(DialogInterface.BUTTON_NEGATIVE, negativeText, listener);
-
-            if (positiveListener != null || negativeListener != null) {
-                dialog.setOnShowListener(new DialogInterface.OnShowListener() {
-                    @Override
-                    public void onShow(DialogInterface dialogInterface) {
-                        if (positiveListener != null) {
-                            Button positive = dialog.getButton(DialogInterface.BUTTON_POSITIVE);
-                            positive.setText(positiveText);
-                            positive.setOnClickListener(positiveListener);
-                        }
-                        if (negativeListener != null) {
-                            Button negative = dialog.getButton(DialogInterface.BUTTON_NEGATIVE);
-                            negative.setText(negativeText);
-                            negative.setOnClickListener(negativeListener);
-                        }
-                    }
-                });
-            }
-        }
-    }
-
-    private void initialDialog() {
-        setupDialog("Search for a Bluetooth device", "Search", "Cancel",
-                new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        startDiscovery();
-                    }
-                },
-                null);
-    }
-
-    private void discoveringDialog() {
-        setupDialog("Searching for Bluetooth devices...", "Stop", "Cancel",
-                new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        stopDiscovery();
-                    }
-                },
-                null);
-    }
-
-    private void retryDialog() {
-        setupDialog("Select a Bluetooth device or rediscover", "Retry", "Cancel",
-                new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        startDiscovery();
-                    }
-                },
-                null);
-    }
-
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-
-        FragmentManager manager = getActivity().getSupportFragmentManager();
-        final Fragment fragment = manager.findFragmentById(R.id.device_list_fragment);
-        if (fragment != null) {
-            manager.beginTransaction().remove(fragment).commit();
-        }
-    }
 
 
 }

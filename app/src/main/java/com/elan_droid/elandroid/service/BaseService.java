@@ -9,8 +9,11 @@ import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.util.Log;
+import android.widget.Toast;
 
+import com.elan_droid.elandroid.R;
 import com.elan_droid.elandroid.database.AppDatabase;
 import com.elan_droid.elandroid.database.entity.Trip;
 import com.elan_droid.elandroid.database.relation.Command;
@@ -25,8 +28,9 @@ import java.util.List;
 
 /**
  * Created by Peter Smith on 4/22/2018.
+ *
+ *
  */
-
 public class BaseService extends Service {
 
     public final static String TAG = "BaseService";
@@ -44,6 +48,8 @@ public class BaseService extends Service {
         public static final int LOGGING_STATE_STARTED = 0;
         public static final int LOGGING_STATE_STOPPED = 1;
     public static final int MESSAGE_COMMAND_STOP_LOGGING = 9;
+
+
 
     private final Messenger messenger = new Messenger(new IncomingHandler());
     private final List<Messenger> clients = new ArrayList<>();
@@ -100,10 +106,7 @@ public class BaseService extends Service {
     public void onCreate() {
         super.onCreate();
 
-        if (!init) {
-            database = AppDatabase.getInstance(getApplicationContext());
-            init = true;
-        }
+        database = AppDatabase.getInstance(getApplicationContext());
     }
 
     @Nullable
@@ -134,29 +137,36 @@ public class BaseService extends Service {
         }
     }
 
+    private void sendToast (@StringRes int resource, int length) {
+        sendToast(getString(resource), length);
+    }
+
     /**
      * Send's a message back with some Toast in it, which will "popup" to user.
      * @param message   the message to be displayed
      */
-    private void sendToast (String message) {
+    private void sendToast (String message, int length) {
         Message msg = new Message();
         msg.what = MESSAGE_TOAST;
         msg.obj = message;
+        msg.arg1 = length;
         sendToClients (msg);
     }
 
 
     /**
-     * Bluetooth methods
+     * BLUETOOTH
+     * METHODS
+     * BELOW
      */
 
     /**
-     *
-     * @return
+     * Get's the instance of the BluetoothManager
+     * @return  the BluetoothManager
      */
     private BluetoothManager getBluetoothManager() {
         if (bluetoothManager == null) {
-            bluetoothManager = new BluetoothManager(messenger);
+            bluetoothManager = BluetoothManager.getInstance(messenger);
         }
         return bluetoothManager;
     }
@@ -193,27 +203,31 @@ public class BaseService extends Service {
     }
 
     /**
-     *
+     * Checks that:
+     *  a) You're connect to a device with an open stream.
+     *  b) There is not an active logging process.
+     *  c)
      * @param trip
      */
     private void startLoggingWithValidation (Trip trip) {
 
         if (loggingManager != null) {
-            sendToast("There is already an active trip");
+            sendToast(R.string.service_toast_logging_active, Toast.LENGTH_LONG);
         }
 
         else if (trip == null) {
-            sendToast("Unable to start trip, please try again");
+            sendToast(R.string.service_toast_logging_unable_to_start, Toast.LENGTH_LONG);
         }
 
         else if (trip.getId() == 0) {   // We need to baseInsert the trip into the database
-            new TripModel.PopulateAsyncTask(database, new TripModel.InsertTripCallback() {
+            new TripModel.InsertTripTask(database, new TripModel.InsertTripCallback() {
                 @Override
                 public void onTripInserted(Trip trip) {
+                    // Ensure's the trip isn't null, otherwise sends toast
                     if (trip != null) {
                         startLogging(trip);
                     }
-                    else sendToast("Unable to create new trip.");
+                    else sendToast(R.string.service_toast_logging_unable_to_create_trip, Toast.LENGTH_LONG);
                 }
             }).execute(trip);
         }
@@ -227,7 +241,7 @@ public class BaseService extends Service {
      */
     private void startLogging (final Trip trip) {
         if (trip.getMessageId() == 0) {
-            sendToast ("The trip has no message associated");
+            sendToast(R.string.service_toast_logging_unable_to_start, Toast.LENGTH_LONG);
         }
         else {
             new CommandModel.FetchCommandTask(database, new CommandModel.FetchCommandCallback() {
@@ -250,11 +264,15 @@ public class BaseService extends Service {
         this.activeCommand = command;
 
         IOStrategy strategy = new LoggingStrategy(database, trip.getId(), command.getRequest(), command.getResponse());
-        getBluetoothManager().setStrategy(strategy);
+        getBluetoothManager().startLogging(strategy);
 
         setLoggingState(LOGGING_STATE_STARTED);
     }
 
+    /**
+     *
+     * @param state
+     */
     private void setLoggingState (int state) {
         Message msg = new Message();
         msg.what = BaseService.MESSAGE_LOGGING_STATE_CHANGE;
@@ -264,8 +282,45 @@ public class BaseService extends Service {
     }
 
     private void stopLogging (String tripName) {
+        if (bluetoothManager != null) {
+            bluetoothManager.stopLogging();
+        }
 
+        if (tripName == null)
+            delete (activeTrip);
+        else {
+            this.activeTrip.setName(tripName);
+            save(activeTrip);
+        }
+        this.activeTrip = null;
+        this.activeCommand = null;
         setLoggingState(BaseService.LOGGING_STATE_STOPPED);
+    }
+
+    /**
+     *
+     * @param trip
+     */
+    private void delete (final Trip trip) {
+        Log.i(TAG, "Deleting trip " + trip.toString());
+        new TripModel.DeleteTripAsyncTask(database, new TripModel.DeleteTripCallback() {
+            @Override
+            public void onDelete(boolean success) {
+                sendToast(success ? R.string.service_toast_logging_delete_success :
+                        R.string.service_toast_logging_delete_failed, Toast.LENGTH_LONG);
+            }
+        }).execute(trip);
+    }
+
+    private void save (final Trip trip) {
+        Log.i(TAG, "Saving trip " + trip.toString());
+        new TripModel.UpdateAsyncTask(database, new TripModel.UpdateTripCallback() {
+            @Override
+            public void onUpdate(boolean success) {
+                sendToast(success ? R.string.service_toast_logging_save_success :
+                        R.string.service_toast_logging_save_failed , Toast.LENGTH_LONG);
+            }
+        }).execute(trip);
     }
 
 

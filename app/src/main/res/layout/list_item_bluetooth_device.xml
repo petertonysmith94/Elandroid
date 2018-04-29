@@ -15,7 +15,7 @@
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="80dp"
-        android:padding="@dimen/list_item_padding"
+        android:padding="@dimen/list_item_padding_large"
         android:weightSum="2">
 
         <ImageView
@@ -23,7 +23,7 @@
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_gravity="center"
-            android:padding="@dimen/list_item_padding"
+            android:padding="@dimen/list_item_padding_large"
             android:src="@{device.paired ? @android:drawable/star_big_on : @android:drawable/star_big_off}" />
 
         <LinearLayout
@@ -32,7 +32,7 @@
             android:layout_gravity="center"
             android:orientation="vertical"
             android:weightSum="2"
-            android:paddingLeft="@dimen/list_item_padding">
+            android:paddingLeft="@dimen/list_item_padding_large">
 
             <TextView
                 android:id="@+id/list_item_device_name_text"

@@ -43,7 +43,7 @@ public class ActiveTrip extends AndroidViewModel {
         this.latestPacket = Transformations.switchMap(trip, new Function<Trip, LiveData<Packet>>() {
             @Override
             public LiveData<Packet> apply(Trip input) {
-                return database.packetDao().getLatest(input.getId());
+                return input == null ? null : database.packetDao().getLatest(input.getId());
             }
         });
         this.latestFlags = new MediatorLiveData<>();

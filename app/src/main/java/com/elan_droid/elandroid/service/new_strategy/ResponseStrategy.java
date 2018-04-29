@@ -5,6 +5,8 @@ import java.io.InputStream;
 
 /**
  * Created by Peter Smith on 4/27/2018.
+ *
+ *
  **/
 public interface ResponseStrategy extends RequestStrategy {
 

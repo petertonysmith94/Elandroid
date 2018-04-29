@@ -4,7 +4,7 @@
     <!-- Database values -->
         <string name="database_table_name">elandroid</string>
 
-    <!-- -->
+    <!-- Shared preferences -->
     <string name="shared_prefs_profile">user_profile</string>
     <string name="saved_active_profile_id">saved_active_profile_id</string>
 
@@ -35,7 +35,6 @@
     <string name="dashboard_title">Dashboard</string>
 
 
-
     <!-- Profile activity -->
     <string name="action_add_profile">Add profile</string>
     <string name="action_save_profile">Save</string>
@@ -60,7 +59,26 @@
     <string name="edit_profile_reg_placeholder">E14 N01</string>
     <string name="edit_profile_active_checkbox_text">Active profile</string>
 
+    <!-- Save trip dialog -->
+    <string name="save_trip_dialog_title">Would you like to save the trip?</string>
+    <string name="save_trip_dialog_save">Save trip</string>
+    <string name="save_trip_dialog_resume">Resume</string>
+    <string name="save_trip_dialog_delete">Delete</string>
 
+    <!-- Device List -->
+    <string name="device_list_discovering">Searching for nearby devices</string>
+    <string name="device_list_no_devices">Could not find any devices nearby, please try again.</string>
+
+    <!-- Service toasts -->
+    <string name="service_toast_logging_active">There is already an active trip</string>
+    <string name="service_toast_logging_unable_to_start">Unable to start logging, please try again</string>
+    <string name="service_toast_logging_unable_to_create_trip">Unable to create new trip.</string>
+
+    <string name="service_toast_logging_delete_success">Successfully delete the trip.</string>
+    <string name="service_toast_logging_delete_failed">An error occurred while delete the trip.</string>
+
+    <string name="service_toast_logging_save_success">Successfully saved the trip.</string>
+    <string name="service_toast_logging_save_failed">An error occurred while saving the trip.</string>
 
     <!-- Action bar menu -->
     <string name="action_settings">Settings</string>

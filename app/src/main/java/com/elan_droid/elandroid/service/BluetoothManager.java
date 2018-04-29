@@ -38,7 +38,25 @@ public class BluetoothManager extends BaseManager {
     private int state;
     private BluetoothDevice target;
 
-    public BluetoothManager(Messenger messenger) {
+    private static BluetoothManager INSTANCE;
+
+    /**
+     * Retrieves the single instance of the BluetoothManager
+     * @param messenger
+     * @return
+     */
+    public static BluetoothManager getInstance (Messenger messenger) {
+        if (INSTANCE == null) {
+            INSTANCE = new BluetoothManager(messenger);
+        }
+        return INSTANCE;
+    }
+
+    /**
+     * Private the ensure that it is use with the singleton
+     * @param messenger
+     */
+    private BluetoothManager(Messenger messenger) {
         super(messenger);
 
         this.mAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -48,8 +66,8 @@ public class BluetoothManager extends BaseManager {
 
     /**
      * Synchronously sets the state of the logging manager.
-     *
-     * @param state new state
+     * Only if the state has not changed.
+     * @param state     the new state
      */
     private synchronized void setState(int state) {
         if (this.state != state) {
@@ -65,24 +83,13 @@ public class BluetoothManager extends BaseManager {
     }
 
     /**
-     *
+     * Synchronously retrieves the state
      * @return
      */
     public synchronized int getState () {
         return this.state;
     }
 
-    private synchronized boolean setTarget (BluetoothDevice device) {
-        final boolean condition = state == BLUETOOTH_STATE_NONE;
-        if (condition) {
-            this.target = device;
-        }
-        return condition;
-    }
-
-    public synchronized BluetoothDevice getTarget () {
-        return this.target;
-    }
 
     /**
      * Connects to a give Bluetooth device
@@ -115,7 +122,28 @@ public class BluetoothManager extends BaseManager {
         setTarget(null);
     }
 
-    synchronized void setStrategy (IOStrategy strategy) {
+    /**
+     *
+     * @return
+     */
+    public synchronized BluetoothDevice getTarget () {
+        return this.target;
+    }
+
+    /**
+     * Set's the target device that we want to connect to.
+     * @param device
+     * @return
+     */
+    private synchronized boolean setTarget (BluetoothDevice device) {
+        final boolean condition = state == BLUETOOTH_STATE_NONE;
+        if (condition) {
+            this.target = device;
+        }
+        return condition;
+    }
+
+    synchronized void startLogging (IOStrategy strategy) {
         ConnectedThread thread;
 
         synchronized (this) {
@@ -125,7 +153,30 @@ public class BluetoothManager extends BaseManager {
             thread = mConnectedThread;
         }
 
-        thread.setStrategy(strategy);
+        thread.startLogging(strategy);
+    }
+
+    synchronized void stopLogging () {
+        ConnectedThread thread;
+
+        synchronized (this) {
+            if (state != BLUETOOTH_STATE_CONNECTED) {
+                return;
+            }
+            thread = mConnectedThread;
+        }
+
+        if (thread != null) {
+            final BluetoothSocket socket = thread.getSocket();
+
+            //mConnectedThread.closeStreams();
+            mConnectedThread.interrupt();
+            mConnectedThread = null;
+
+            mConnectedThread = new ConnectedThread(socket);
+            mConnectedThread.start();
+        }
+
     }
 
     /**
@@ -270,12 +321,15 @@ public class BluetoothManager extends BaseManager {
 
         private RequestStrategy mmRequestStrategy;
         private ResponseStrategy mmResponseStrategy;
+
         private boolean mmHasResponse;
         private boolean mmAutoStart;
+        private boolean mmStop;
 
         public ConnectedThread (final BluetoothSocket socket) {
             mmAutoStart = false;
             mmSocket = socket;
+            mmStop = false;
 
             // Ensures socket ain't null then gets the I/0 stream
             if(socket != null) {
@@ -301,7 +355,7 @@ public class BluetoothManager extends BaseManager {
             }
         }
 
-        public synchronized void setStrategy (IOStrategy strategy) {
+        synchronized void startLogging (IOStrategy strategy) {
             if (strategy instanceof RequestStrategy) {
                 this.mmRequestStrategy = (RequestStrategy) strategy;
             }
@@ -316,6 +370,14 @@ public class BluetoothManager extends BaseManager {
             }
         }
 
+        synchronized void stopLogging() {
+            this.mmStop = true;
+        }
+
+        synchronized BluetoothSocket getSocket() {
+            return this.mmSocket;
+        }
+
         @Override
         public void run() {
             if (mmInStream == null) {
@@ -327,7 +389,12 @@ public class BluetoothManager extends BaseManager {
 
             while (state == BLUETOOTH_STATE_CONNECTED) {
                 try {
-                    while (mmRequestStrategy == null) {
+                    while (mmRequestStrategy == null || mmStop) {
+                        if (mmStop) {
+                            mmRequestStrategy = null;
+                            mmResponseStrategy = null;
+                            mmStop = false;
+                        }
                         sleep(20);
 
                         if (mmInStream != null && mmInStream.available() > 0) {
@@ -335,19 +402,24 @@ public class BluetoothManager extends BaseManager {
                         }
                     }
 
-                    /**
                     if (result < 0) {
                         sleep(100);
 
                         if (mmInStream != null && mmInStream.available() > 0) {
-                            mmInStream.skip(mmInStream.available());
+
+                            if (mmInStream.available() > 0) {
+                                sleep (200);
+
+                                while (mmInStream.available() > 0) {
+                                    long skip = mmInStream.skip(mmInStream.available());
+                                    Log.i(TAG, "Skipping " + skip + " bytes");
+                                    sleep(50);
+                                }
+                            }
                         }
-                        sleep(100);
+                        //sleep(100);
                         result = IOStrategy.RESULT_TRIGGER;
                     }
-                     **/
-
-
 
                     if (result == IOStrategy.RESULT_TRIGGER) {
                         result = mmRequestStrategy.executeRequest(result, mmOutStream);
@@ -361,11 +433,12 @@ public class BluetoothManager extends BaseManager {
                     }
                 }
                 catch (IOException e) {
-                    Log.e(TAG, "ConnectedThread:run() failed to read bytes");
+                    Log.e(TAG, "ConnectedThread:run() connection lost", e);
                     connectionLost();
                 }
                 catch (InterruptedException e) {
-                    Log.e(TAG, "ConnectedThread:run() failed to sleep thread");
+                    Log.e(TAG, "ConnectedThread:run() failed to sleep thread", e);
+                    return;
                 }
             }
         }
@@ -374,7 +447,7 @@ public class BluetoothManager extends BaseManager {
          * Writes an array of bytes to the output stream
          * @param buffer    the bytes to write
          */
-        public void write(byte[] buffer) {
+        void write(byte[] buffer) {
             try {
                 mmOutStream.write(buffer);
             } catch (IOException e) {
@@ -382,7 +455,22 @@ public class BluetoothManager extends BaseManager {
             }
         }
 
-        public void cancel() {
+        void closeStreams() {
+            Log.d(TAG, "ConnectedThread:closeStreams () called");
+            try {
+                if (mmInStream != null) {
+                    mmInStream.close();
+                }
+
+                if (mmOutStream != null) {
+                    mmOutStream.close();
+                }
+            } catch (IOException e) {
+                Log.e(TAG, "ConnectedThread:cancel() failed to close the stream", e);
+            }
+        }
+
+        void cancel() {
             Log.d(TAG, "ConnectedThread:cancel() called");
             try {
                 if (mmSocket != null) {

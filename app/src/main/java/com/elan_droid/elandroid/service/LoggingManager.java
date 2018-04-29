@@ -12,7 +12,12 @@ import com.elan_droid.elandroid.database.entity.ParameterStream;
 import com.elan_droid.elandroid.database.entity.Trip;
 import com.elan_droid.elandroid.database.relation.Command;
 import com.elan_droid.elandroid.database.view_model.TripModel;
+import com.elan_droid.elandroid.service.new_strategy.IOStrategy;
+import com.elan_droid.elandroid.service.new_strategy.ResponseStrategy;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Arrays;
 
 /**
@@ -33,7 +38,6 @@ public class LoggingManager extends BaseManager {
     //
     private Trip currTrip;
     private Command currCommand;
-
 
     public LoggingManager (Messenger messenger, AppDatabase database) {
         super (messenger);
@@ -63,7 +67,6 @@ public class LoggingManager extends BaseManager {
     public synchronized int getState() {
         return this.state;
     }
-
 
     protected synchronized void start (Trip trip, Command  command) {
         if (state == BaseService.LOGGING_STATE_STOPPED) {

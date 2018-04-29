@@ -15,10 +15,8 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
-import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -40,7 +38,8 @@ import com.elan_droid.elandroid.ui.dialog.SaveTripDialog;
  * Created by Peter Smith
  */
 
-public abstract class ServiceActivity extends NavigationActivity implements DeviceAdapter.OnDeviceSelectedListener {
+public abstract class ServiceActivity extends NavigationActivity implements
+        DeviceAdapter.OnDeviceSelectedListener, SaveTripDialog.OnTripActionListener {
 
     private static final String TAG = "ServiceActivity";
 
@@ -84,7 +83,7 @@ public abstract class ServiceActivity extends NavigationActivity implements Devi
                 case BaseService.MESSAGE_TOAST:
                     String toast = (String) msg.obj;
                     if (toast != null) {
-                        Toast.makeText(getApplicationContext(), toast, Toast.LENGTH_LONG);
+                        Toast.makeText(getApplicationContext(), toast, Toast.LENGTH_LONG).show();
                     }
                     break;
 
@@ -234,38 +233,46 @@ public abstract class ServiceActivity extends NavigationActivity implements Devi
     private void handleLoggingState (Message msg) {
         switch (msg.arg1) {
             case BaseService.LOGGING_STATE_STARTED:
-                setConnectionStatus(ConnectionStatus.LOGGING);
+                final Trip trip = (Trip) msg.obj;
 
-                mTripModel.setTrip((Trip) msg.obj);
+                if (trip != null) {
+                    setConnectionStatus(ConnectionStatus.LOGGING);
+                }
+                mTripModel.setTrip(trip);
                 break;
 
             case BaseService.LOGGING_STATE_STOPPED:
                 setConnectionStatus(ConnectionStatus.CONNECTED);
-
                 mTripModel.setTrip(null);
                 break;
         }
     }
 
-
-    private void launchStopTripDialog (DialogInterface.OnClickListener positiveListener) {
-        new AlertDialog.Builder(this)
-                .setMessage("Are you sure that you want to stop logging the current trip?")
-                // Inverted because we don't want users to end the trip...
-                .setNegativeButton("Yes", positiveListener)
-                .setPositiveButton("No", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.dismiss();
-                    }
-                }).create().show();
+    /**
+     * Launches dialog: do you want to save the current trip?
+     */
+    private void stopLogging() {
+        DialogFragment dialog = SaveTripDialog.getInstance();
+        displayDialog(dialog);
     }
 
     /**
-     *
+     * Callbacks from SaveTripDialog, send to service
+     */
+    @Override
+    public void onSaveTrip(String tripName) {
+        serviceStopLogging(tripName);
+    }
+    @Override
+    public void onDelete() {
+        serviceStopLogging(null);
+    }
+
+    /**
+     * Sends message to the service, notifying it to stop logging
      * @param name      null then don't save, non-null then save
      */
-    private void launchStopLoggingDialog(String name) {
+    private void serviceStopLogging (@Nullable String name) {
         Message msg = new Message();
         msg.what = BaseService.MESSAGE_COMMAND_STOP_LOGGING;
         msg.obj = name;
@@ -274,31 +281,11 @@ public abstract class ServiceActivity extends NavigationActivity implements Devi
         setConnectionStatus(ConnectionStatus.CONNECTED);
     }
 
-    /**
-     * Launches dialog: do you want to save the current trip?
-     */
-    private void launchStopLoggingDialog() {
-        DialogFragment dialog = SaveTripDialog.getInstance();
-        displayDialog(dialog);
-    }
-
-    public void saveTrip (@NonNull String name) {
-        launchStopLoggingDialog(name);
-    }
-
-    public void deleteTrip () {
-        launchStopLoggingDialog(null);
-    }
-
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            // Display
             case R.id.menu_connect:
                 displayDialog(DeviceSelectDialog.getInstance());
-                //setConnectionStatus(ConnectionStatus.CONNECTED);
-                //Toast.makeText(getApplicationContext(), "Connecting", Toast.LENGTH_SHORT).show();
                 return true;
 
             case R.id.menu_connected_start_logging:
@@ -310,11 +297,11 @@ public abstract class ServiceActivity extends NavigationActivity implements Devi
                 return true;
 
             case R.id.menu_logging_stop:
-                launchStopLoggingDialog();
+                stopLogging();
                 return true;
 
             case R.id.menu_logging_disconnect:
-                launchStopLoggingDialog();
+                stopLogging();
                 disconnectBluetooth();
                 return true;
 
@@ -327,16 +314,16 @@ public abstract class ServiceActivity extends NavigationActivity implements Devi
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.nav_header_container:
-                if (mConnectionStatus != ConnectionStatus.LOGGING) {
-                    // Launches the profile selection dialogs
-                    super.onClick(view);
-                }
-                else {
+                // Ensure's we can't change profiles while logging
+                // TODO: dialog to switch profile while logging... maybe
+                if (mConnectionStatus == ConnectionStatus.LOGGING) {
                     Toast.makeText(this, R.string.toast_cannot_profile_change, Toast.LENGTH_SHORT).show();
+                    return;
                 }
                 break;
 
         }
+        super.onClick(view);
     }
 
 }

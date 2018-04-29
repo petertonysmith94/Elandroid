@@ -1,28 +1,52 @@
-<?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
+<?xml version='1.0' encoding='utf-8'?>
+<layout xmlns:android='http://schemas.android.com/apk/res/android'>
 
     <data>
         <variable
-            name="data"
-            type="com.elan_droid.elandroid.ui.bluetooth.DeviceList"/>
+            name='data'
+            type='com.elan_droid.elandroid.ui.bluetooth.DeviceList'/>
     </data>
 
-    <FrameLayout
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width='match_parent'
+        android:layout_height='match_parent'
+        android:orientation='vertical'>
+
+
+        <LinearLayout
+            android:layout_width='match_parent'
+            android:layout_height='@dimen/list_item_medium_height'
+            android:orientation='horizontal'>
+
+            <ProgressBar
+                android:layout_width='wrap_content'
+                android:layout_height='wrap_content'
+                android:padding='@dimen/device_list_progess_padding'
+                android:visibility='@{ data.discoveryVisibility }' />
+
+            <TextView
+                android:layout_width='match_parent'
+                android:layout_height='wrap_content'
+                android:padding='@dimen/list_item_padding_large'
+                android:text='@{data.discovering ? @string/device_list_discovering : (data.nothing ? "We could not find any devices nearby, please try again!" : "Select a device, or try again!" ) }'
+                android:layout_gravity='center' />
+
+        </LinearLayout>
 
         <TextView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:text="There are no devices here"
-            android:visibility="@{data.nothingVisibility}"/>
+            android:layout_width='match_parent'
+            android:layout_height='wrap_content'
+            android:padding='@dimen/list_item_padding_large'
+            android:text='@string/device_list_no_devices'
+            android:textAlignment='center'
+            android:visibility='@{data.nothingVisibility}' />
 
         <android.support.v7.widget.RecyclerView
-            android:id="@+id/device_list"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:visibility="@{data.listVisibility}"/>
+            android:id='@+id/device_list'
+            android:layout_width='match_parent'
+            android:layout_height='wrap_content'
+            android:visibility='@{data.listVisibility}' />
 
-    </FrameLayout>
+    </LinearLayout>
 </layout>

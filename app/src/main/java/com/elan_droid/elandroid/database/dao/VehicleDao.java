@@ -16,6 +16,11 @@ import java.util.List;
 @Dao
 public abstract class VehicleDao implements BaseDao<Vehicle> {
 
+    @Query ("SELECT *" +
+            " FROM " + Vehicle.TABLE_NAME +
+            " WHERE " + Vehicle.COLUMN_MAKE + " LIKE :make" +
+            " AND " + Vehicle.COLUMN_MODEL  + " LIKE :model LIMIT 1")
+    public abstract Vehicle getVehicle (String make, String model);
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
     public abstract void update (Vehicle vehicle);

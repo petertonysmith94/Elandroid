@@ -1,5 +1,6 @@
 package com.elan_droid.elandroid.service.new_strategy;
 
+import android.database.sqlite.SQLiteConstraintException;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.util.Xml;
@@ -52,6 +53,11 @@ public class LoggingStrategy implements ResponseStrategy {
         total = 0;
         rate = 0.0;
         formatter = new DecimalFormat("#0.00");
+    }
+
+    @Override
+    public int execute(int requestCode, OutputStream out, InputStream in) throws IOException {
+        return 0;
     }
 
     @Override
@@ -145,10 +151,16 @@ public class LoggingStrategy implements ResponseStrategy {
             packet.setData(response.stripPayload(buffer));
 
             if (packet.getData() != null) {
-                Packet tmp = database.packetDao().insertPacket(packet);
+                try {
+                    Packet tmp = database.packetDao().insertPacket(packet);
 
-                if (tmp != null) {
-                    database.flagDao().insert(response.format(tmp));
+                    if (tmp != null) {
+                        database.flagDao().insert(response.format(tmp));
+                    }
+                }
+                catch (SQLiteConstraintException e) {
+                    Log.e(TAG, "Failed to insert formatted flags into the database", e);
+                    return ERROR_DATABASE;
                 }
             }
             requestCode = RESULT_TRIGGER;
