@@ -21,10 +21,10 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.elan_droid.elandroid.R;
-import com.elan_droid.elandroid.database.relation.Profile;
+import com.elan_droid.elandroid.database.data.relation.Profile;
 import com.elan_droid.elandroid.database.view_model.ActiveProfile;
 import com.elan_droid.elandroid.database.view_model.VehicleModel;
-import com.elan_droid.elandroid.ui.generic.MainActivity;
+import com.elan_droid.elandroid.activity.MainActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -132,7 +132,7 @@ public class ProfileNew extends Fragment {
         String make = mMakeSpinner.getSelectedItem().toString();
         String model = mModelSpinner.getSelectedItem().toString();
         String reg = mRegEditText.getText().toString();
-        boolean active = mActiveCheck.isChecked();
+        boolean active = mAction == ACTION_FORCE || mActiveCheck.isChecked();
 
 
         mActiveProfile.newProfile(name, make, model, reg, active, new ActiveProfile.InternalPopulateProfileCallback() {
@@ -200,12 +200,12 @@ public class ProfileNew extends Fragment {
 
 
         /** Fetching the UI elements **/
-        mNameEditText = (EditText) view.findViewById(R.id.edit_profile_name_edit);
+        mNameEditText = view.findViewById(R.id.edit_profile_name_edit);
         mNameEditText.requestFocus();
-        mMakeSpinner = (Spinner) view.findViewById(R.id.edit_profile_make_spinner);
-        mModelSpinner = (Spinner) view.findViewById(R.id.edit_profile_model_spinner);
-        mRegEditText = (EditText) view.findViewById(R.id.edit_profile_reg_edit);
-        mActiveCheck = (CheckBox) view.findViewById(R.id.edit_profile_active_check);
+        mMakeSpinner = view.findViewById(R.id.edit_profile_make_spinner);
+        mModelSpinner = view.findViewById(R.id.edit_profile_model_spinner);
+        mRegEditText = view.findViewById(R.id.edit_profile_reg_edit);
+        mActiveCheck = view.findViewById(R.id.edit_profile_active_check);
 
         /** Attaches the make spinner logic **/
         mMakeSpinner.setAdapter(mMakeAdapter);

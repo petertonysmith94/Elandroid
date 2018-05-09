@@ -5,9 +5,9 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.os.Messenger;
 import android.os.ParcelUuid;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
-import com.elan_droid.elandroid.database.relation.Command;
 import com.elan_droid.elandroid.service.new_strategy.IOStrategy;
 import com.elan_droid.elandroid.service.new_strategy.RequestStrategy;
 import com.elan_droid.elandroid.service.new_strategy.ResponseStrategy;
@@ -19,8 +19,9 @@ import java.util.UUID;
 
 /**
  * Created by Peter Smith on 4/26/2018.
+ *
+ *
  **/
-
 public class BluetoothManager extends BaseManager {
 
     private final static String TAG = "BluetoothManager";
@@ -32,6 +33,7 @@ public class BluetoothManager extends BaseManager {
 
     private final BluetoothAdapter mAdapter;
 
+    // Threads
     private ConnectThread mConnectThread;
     private ConnectedThread mConnectedThread;
 
@@ -90,20 +92,29 @@ public class BluetoothManager extends BaseManager {
         return this.state;
     }
 
+    /**
+     * Connects securely to the given BluetoothDevice
+     * @param device
+     */
+    protected synchronized void connect (BluetoothDevice device) {
+        connect (device, true);
+    }
 
     /**
      * Connects to a give Bluetooth device
      * @param device    the target Bluetooth device
      * @param secure    whether the connection should be secure
      */
-    synchronized void connect (BluetoothDevice device, boolean secure) {
+    private synchronized void connect (BluetoothDevice device, boolean secure) {
         if (setTarget(device)) {
             ParcelUuid[] ids = device.getUuids();
 
-            for (ParcelUuid uuid : ids) {
-                if (uuid != null) {
-                    connect(device, secure, uuid.getUuid());
-                    return;
+            if (ids != null) {
+                for (ParcelUuid uuid : ids) {
+                    if (uuid != null) {
+                        connect(device, secure, uuid.getUuid());
+                        return;
+                    }
                 }
             }
         }
@@ -114,7 +125,10 @@ public class BluetoothManager extends BaseManager {
         // TODO: return error code
     }
 
-    synchronized void disconnect () {
+    /**
+     * Disconnects and cancels any active threads
+     */
+    protected synchronized void disconnect () {
         cancelConnectThread();
         cancelConnectedThread();
 
@@ -123,17 +137,17 @@ public class BluetoothManager extends BaseManager {
     }
 
     /**
-     *
-     * @return
+     * Get's the current targeted device
+     * @return  the targeted BluetoothDevice
      */
-    public synchronized BluetoothDevice getTarget () {
+    private synchronized BluetoothDevice getTarget () {
         return this.target;
     }
 
     /**
      * Set's the target device that we want to connect to.
-     * @param device
-     * @return
+     * @param device    the targeted device
+     * @return  condition bluetooth not null and no current target
      */
     private synchronized boolean setTarget (BluetoothDevice device) {
         final boolean condition = state == BLUETOOTH_STATE_NONE;
@@ -143,6 +157,10 @@ public class BluetoothManager extends BaseManager {
         return condition;
     }
 
+    /**
+     *
+     * @param strategy
+     */
     synchronized void startLogging (IOStrategy strategy) {
         ConnectedThread thread;
 
@@ -166,21 +184,39 @@ public class BluetoothManager extends BaseManager {
             thread = mConnectedThread;
         }
 
+
         if (thread != null) {
-            final BluetoothSocket socket = thread.getSocket();
-
-            //mConnectedThread.closeStreams();
-            mConnectedThread.interrupt();
-            mConnectedThread = null;
-
-            mConnectedThread = new ConnectedThread(socket);
-            mConnectedThread.start();
+            thread.stopLogging(new StopLoggingListener() {
+                @Override
+                public void onFinish(final BluetoothSocket socket, final InputStream in, final OutputStream out) {
+                    if (socket != null) {
+                        mConnectedThread = null;
+                        mConnectedThread = new ConnectedThread(socket, in, out);
+                        mConnectedThread.start();
+                    }
+                    else {
+                        disconnect();
+                    }
+                }
+            });
         }
 
     }
 
     /**
-     * Connects to a give Bluetooth device with no validation
+     *
+     */
+    private interface StopLoggingListener {
+
+        /**
+         *
+         * @param socket
+         */
+        void onFinish (final BluetoothSocket socket, final InputStream in, final OutputStream out);
+    }
+
+    /**
+     * Connects to a give Bluetooth device with no validation.
      * @param device    the target Bluetooth device
      * @param secure    whether the connection should be secure
      * @param uuid      the uuid to be used in the connection
@@ -197,10 +233,22 @@ public class BluetoothManager extends BaseManager {
         setState (BLUETOOTH_STATE_CONNECTING);
     }
 
+    /**
+     * Connection has failed, send message to service.
+     * TODO: send message to service
+     * @param device
+     * @param secure
+     * @param uuid
+     */
     private synchronized void connectFailed (BluetoothDevice device, boolean secure, UUID uuid) {
         disconnect();
     }
 
+    /**
+     * Transition to a connected state
+     * @param socket    the socket established during ConnectThread
+     * @param device    the device we are connected to
+     */
     private synchronized void connected (BluetoothSocket socket, BluetoothDevice device) {
         Log.d(TAG, "BluetoothManager:connected() => " + device);
         setTarget(device);
@@ -215,6 +263,10 @@ public class BluetoothManager extends BaseManager {
 
     }
 
+    /**
+     * Connection has been lost
+     * TODO: send message to service
+     */
     private synchronized void connectionLost () {
         disconnect();
     }
@@ -240,6 +292,10 @@ public class BluetoothManager extends BaseManager {
         }
     }
 
+    /**
+     * Establishes a connection with a BluetoothDevice.
+     *  If successful, a BluetoothSocket will be the result.
+     */
     private class ConnectThread extends Thread {
 
         private final BluetoothDevice mmDevice;
@@ -312,7 +368,10 @@ public class BluetoothManager extends BaseManager {
         }
     }
 
-
+    /**
+     * Maintains the socket to a BluetoothDevice.
+     * TODO: Move logging implementation into separate classes
+     */
     private class ConnectedThread extends Thread {
 
         private final BluetoothSocket mmSocket;
@@ -324,7 +383,9 @@ public class BluetoothManager extends BaseManager {
 
         private boolean mmHasResponse;
         private boolean mmAutoStart;
+
         private boolean mmStop;
+        private StopLoggingListener stopListener;
 
         public ConnectedThread (final BluetoothSocket socket) {
             mmAutoStart = false;
@@ -341,12 +402,11 @@ public class BluetoothManager extends BaseManager {
                     tmpOut = socket.getOutputStream();
                 } catch (IOException e) {
                     Log.d(TAG, "ConnectedThread: constructor() couldn't get input and output streams", e);
+                    disconnect();
                 }
 
                 mmInStream = tmpIn;
                 mmOutStream = tmpOut;
-
-
             }
             else {
                 disconnect();
@@ -354,6 +414,19 @@ public class BluetoothManager extends BaseManager {
                 mmOutStream = null;
             }
         }
+
+        private ConnectedThread (final BluetoothSocket socket, final InputStream in, final OutputStream out) {
+            if (socket == null || in == null || out == null) {
+                disconnect();
+            }
+
+            mmAutoStart = false;
+            mmSocket = socket;
+            mmStop = false;
+            mmInStream = in;
+            mmOutStream = out;
+        }
+
 
         synchronized void startLogging (IOStrategy strategy) {
             if (strategy instanceof RequestStrategy) {
@@ -370,14 +443,6 @@ public class BluetoothManager extends BaseManager {
             }
         }
 
-        synchronized void stopLogging() {
-            this.mmStop = true;
-        }
-
-        synchronized BluetoothSocket getSocket() {
-            return this.mmSocket;
-        }
-
         @Override
         public void run() {
             if (mmInStream == null) {
@@ -389,7 +454,7 @@ public class BluetoothManager extends BaseManager {
 
             while (state == BLUETOOTH_STATE_CONNECTED) {
                 try {
-                    while (mmRequestStrategy == null || mmStop) {
+                    while (mmRequestStrategy == null) {
                         if (mmStop) {
                             mmRequestStrategy = null;
                             mmResponseStrategy = null;
@@ -431,6 +496,11 @@ public class BluetoothManager extends BaseManager {
                         result = mmResponseStrategy.executeResponse(result, mmInStream);
                         result = mmResponseStrategy.postResponse(result);
                     }
+
+                    if (mmStop) {
+                        stopListener.onFinish(mmSocket, mmInStream, mmOutStream);
+                        return;
+                    }
                 }
                 catch (IOException e) {
                     Log.e(TAG, "ConnectedThread:run() connection lost", e);
@@ -455,19 +525,9 @@ public class BluetoothManager extends BaseManager {
             }
         }
 
-        void closeStreams() {
-            Log.d(TAG, "ConnectedThread:closeStreams () called");
-            try {
-                if (mmInStream != null) {
-                    mmInStream.close();
-                }
-
-                if (mmOutStream != null) {
-                    mmOutStream.close();
-                }
-            } catch (IOException e) {
-                Log.e(TAG, "ConnectedThread:cancel() failed to close the stream", e);
-            }
+        void stopLogging(@NonNull StopLoggingListener listener) {
+            this.mmStop = true;
+            this.stopListener = listener;
         }
 
         void cancel() {

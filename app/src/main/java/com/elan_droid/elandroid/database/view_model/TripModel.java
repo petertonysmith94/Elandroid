@@ -8,7 +8,7 @@ import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 
 import com.elan_droid.elandroid.database.AppDatabase;
-import com.elan_droid.elandroid.database.entity.Trip;
+import com.elan_droid.elandroid.database.data.entity.Trip;
 
 import java.util.List;
 
@@ -176,7 +176,7 @@ public class TripModel extends AndroidViewModel {
     }
 
     public interface UpdateTripCallback {
-        public void onUpdate (boolean success);
+        void onUpdate(boolean success);
     }
 
     public static class UpdateAsyncTask extends AsyncTask<Trip, Void, Boolean> {
@@ -205,7 +205,7 @@ public class TripModel extends AndroidViewModel {
     }
 
     public interface DeleteTripCallback {
-        public void onDelete (boolean success);
+        void onDelete(boolean success);
     }
 
     public static class DeleteTripAsyncTask extends AsyncTask<Trip, Void, Boolean> {

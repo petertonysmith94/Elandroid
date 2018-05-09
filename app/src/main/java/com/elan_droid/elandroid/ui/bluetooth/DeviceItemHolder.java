@@ -1,15 +1,9 @@
 package com.elan_droid.elandroid.ui.bluetooth;
 
-import android.bluetooth.BluetoothClass;
-import android.bluetooth.BluetoothDevice;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.widget.ImageView;
-import android.widget.TextView;
 
-import com.elan_droid.elandroid.R;
-import com.elan_droid.elandroid.databinding.DeviceListBinding;
 import com.elan_droid.elandroid.databinding.ListItemBluetoothDeviceBinding;
 
 /**
@@ -26,7 +20,7 @@ public class DeviceItemHolder extends RecyclerView.ViewHolder {
         mmBinding = binding;
     }
 
-    public void bind (@NonNull final DeviceItem device, @NonNull final DeviceAdapter.OnDeviceSelectedListener listener) {
+    public void bind (@NonNull final DeviceItem device, @NonNull final DeviceAdapter.DeviceSelectedListener listener) {
         mmBinding.setDevice(device);
 
         itemView.setOnClickListener(new View.OnClickListener() {

@@ -11,7 +11,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.elan_droid.elandroid.R;
-import com.elan_droid.elandroid.database.entity.Trip;
+import com.elan_droid.elandroid.database.data.entity.Trip;
 import com.elan_droid.elandroid.database.view_model.ActiveTrip;
 
 /**
@@ -39,8 +39,8 @@ public class ActiveTripDebug extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_active_trip_debug,  container);
 
-        tripId = (TextView) view.findViewById(R.id.debug_current_trip);
-        packetCount = (TextView) view.findViewById(R.id.debug_current_packet);
+        tripId = view.findViewById(R.id.debug_current_trip);
+        packetCount = view.findViewById(R.id.debug_current_packet);
 
 
 

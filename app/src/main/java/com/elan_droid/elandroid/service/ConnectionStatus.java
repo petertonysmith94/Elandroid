@@ -8,7 +8,6 @@ import com.elan_droid.elandroid.R;
 /**
  * Created by Peter Smith
  */
-
 public enum ConnectionStatus {
 
     DISCONNECTED(R.menu.service_disconnected, R.id.service_disconnected),

@@ -8,7 +8,7 @@
 
         <variable
             name="itemClickListener"
-            type="com.elan_droid.elandroid.ui.bluetooth.DeviceAdapter.OnDeviceSelectedListener" />
+            type="com.elan_droid.elandroid.ui.bluetooth.DeviceAdapter.DeviceSelectedListener" />
     </data>
 
     <LinearLayout

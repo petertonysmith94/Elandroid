@@ -19,8 +19,9 @@ import static android.app.Activity.RESULT_OK;
 
 /**
  * Created by Peter Smith
+ *
+ *
  */
-
 public class AddPageDialog extends DialogFragment implements DialogInterface.OnClickListener {
 
     private static final int ADD_NEW_PAGE = 0;
@@ -30,6 +31,10 @@ public class AddPageDialog extends DialogFragment implements DialogInterface.OnC
 
     private EditText mNameText;
 
+    /**
+     *
+     * @return
+     */
     public static DialogFragment getInstance() {
         return new AddPageDialog();
     }
@@ -38,7 +43,7 @@ public class AddPageDialog extends DialogFragment implements DialogInterface.OnC
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         View view = getActivity().getLayoutInflater().inflate(R.layout.dialog_dashboard_add_page, null);
-        mNameText = (EditText) view.findViewById(R.id.dialog_dashboard_add_page_name);
+        mNameText = view.findViewById(R.id.dialog_dashboard_add_page_name);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setView(view);

@@ -6,7 +6,7 @@ import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Update;
 
-import com.elan_droid.elandroid.database.entity.Vehicle;
+import com.elan_droid.elandroid.database.data.entity.Vehicle;
 
 import java.util.List;
 

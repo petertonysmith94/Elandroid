@@ -4,8 +4,8 @@ import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Query;
 
-import com.elan_droid.elandroid.database.entity.ParameterFormatted;
-import com.elan_droid.elandroid.database.entity.Message;
+import com.elan_droid.elandroid.database.data.entity.ParameterFormatted;
+import com.elan_droid.elandroid.database.data.entity.Message;
 
 import java.util.List;
 

@@ -6,7 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 
-import com.elan_droid.elandroid.database.entity.Trip;
+import com.elan_droid.elandroid.database.data.entity.Trip;
 import com.elan_droid.elandroid.database.view_model.ActiveTrip;
 
 /**

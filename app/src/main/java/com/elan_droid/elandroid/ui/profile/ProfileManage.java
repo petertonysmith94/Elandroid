@@ -16,8 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.elan_droid.elandroid.R;
-import com.elan_droid.elandroid.adapter.ProfileAdapter;
-import com.elan_droid.elandroid.database.relation.Profile;
+import com.elan_droid.elandroid.database.data.relation.Profile;
 import com.elan_droid.elandroid.database.view_model.ActiveProfile;
 
 import java.util.ArrayList;
@@ -110,7 +109,7 @@ public class ProfileManage extends Fragment {
 
         mLayoutManager = new LinearLayoutManager(getContext());
 
-        mRecyclerView = (RecyclerView) view.findViewById(R.id.profile_list);
+        mRecyclerView = view.findViewById(R.id.profile_list);
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setAdapter(mProfileAdapter);

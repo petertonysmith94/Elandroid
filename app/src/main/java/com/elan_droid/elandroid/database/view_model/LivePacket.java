@@ -2,7 +2,7 @@ package com.elan_droid.elandroid.database.view_model;
 
 import android.arch.lifecycle.LiveData;
 
-import com.elan_droid.elandroid.database.entity.Packet;
+import com.elan_droid.elandroid.database.data.entity.Packet;
 
 /**
  * Created by Peter Smith on 4/27/2018.

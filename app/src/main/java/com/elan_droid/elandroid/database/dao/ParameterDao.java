@@ -3,9 +3,9 @@ package com.elan_droid.elandroid.database.dao;
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Transaction;
 
-import com.elan_droid.elandroid.database.entity.ParameterFormatted;
-import com.elan_droid.elandroid.database.entity.Parameter;
-import com.elan_droid.elandroid.database.entity.ParameterBitwise8;
+import com.elan_droid.elandroid.database.data.entity.ParameterFormatted;
+import com.elan_droid.elandroid.database.data.entity.Parameter;
+import com.elan_droid.elandroid.database.data.entity.ParameterBitwise8;
 
 import java.util.ArrayList;
 import java.util.List;

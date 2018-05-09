@@ -5,14 +5,16 @@ import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Transaction;
 
-import com.elan_droid.elandroid.database.entity.Message;
-import com.elan_droid.elandroid.database.entity.Parameter;
-import com.elan_droid.elandroid.database.relation.Command;
+import com.elan_droid.elandroid.database.data.entity.Message;
+import com.elan_droid.elandroid.database.data.entity.Parameter;
+import com.elan_droid.elandroid.database.data.relation.Command;
 
 import java.util.List;
 
 /**
  * Created by Peter Smith on 4/27/2018.
+ *
+ *
  **/
 @Dao
 public abstract class CommandDao extends ParameterDao implements BaseDao<Message> {

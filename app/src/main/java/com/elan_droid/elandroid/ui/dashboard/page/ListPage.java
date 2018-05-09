@@ -14,14 +14,13 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.elan_droid.elandroid.R;
-import com.elan_droid.elandroid.database.entity.Flag;
-import com.elan_droid.elandroid.database.entity.Packet;
-import com.elan_droid.elandroid.database.entity.Parameter;
-import com.elan_droid.elandroid.database.entity.ParameterBitwise8;
-import com.elan_droid.elandroid.database.entity.ParameterFormatted;
-import com.elan_droid.elandroid.database.entity.Trip;
-import com.elan_droid.elandroid.database.relation.DetailedPage;
-import com.elan_droid.elandroid.database.relation.ParameterFlag;
+import com.elan_droid.elandroid.database.data.entity.Flag;
+import com.elan_droid.elandroid.database.data.entity.Parameter;
+import com.elan_droid.elandroid.database.data.entity.ParameterBitwise8;
+import com.elan_droid.elandroid.database.data.entity.ParameterFormatted;
+import com.elan_droid.elandroid.database.data.entity.Trip;
+import com.elan_droid.elandroid.database.data.relation.DetailedPage;
+import com.elan_droid.elandroid.database.data.relation.ParameterFlag;
 import com.elan_droid.elandroid.database.view_model.ParameterModel;
 
 import java.util.ArrayList;
@@ -102,7 +101,7 @@ public class ListPage extends BasePage {
 
         mLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
 
-        mRecyclerView = (RecyclerView) view.findViewById(R.id.parameter_list);
+        mRecyclerView = view.findViewById(R.id.parameter_list);
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setAdapter(mAdapter);

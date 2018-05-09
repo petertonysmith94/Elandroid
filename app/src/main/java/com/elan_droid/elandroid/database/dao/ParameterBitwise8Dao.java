@@ -4,8 +4,8 @@ import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Query;
 
-import com.elan_droid.elandroid.database.entity.Message;
-import com.elan_droid.elandroid.database.entity.ParameterBitwise8;
+import com.elan_droid.elandroid.database.data.entity.Message;
+import com.elan_droid.elandroid.database.data.entity.ParameterBitwise8;
 
 import java.util.List;
 
@@ -23,15 +23,15 @@ interface ParameterBitwise8Dao {
     List<ParameterBitwise8> fetchBitwise (long messageId);
 
     @Insert
-    public abstract long insertBitwise8 (ParameterBitwise8 element);
+    long insertBitwise8(ParameterBitwise8 element);
 
     @Insert
-    public abstract void insertAll (ParameterBitwise8... elements);
+    void insertAll(ParameterBitwise8... elements);
 
     @Delete
-    public abstract void delete (ParameterBitwise8 element);
+    void delete(ParameterBitwise8 element);
 
     @Delete
-    public abstract void delete (ParameterBitwise8... elements);
+    void delete(ParameterBitwise8... elements);
 
 }

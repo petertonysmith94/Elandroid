@@ -5,7 +5,7 @@ import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Update;
 
-import com.elan_droid.elandroid.database.entity.User;
+import com.elan_droid.elandroid.database.data.entity.User;
 
 /**
  * Created by Peter Smith

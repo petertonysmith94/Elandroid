@@ -12,6 +12,7 @@
             android:icon="@drawable/ic_view_agenda_black_24dp"
             android:title="@string/navigation_drawer_trip_log"/>
 
+        <!--
         <item
             android:id="@+id/nav_statistics"
             android:icon="@drawable/ic_assessment_black_24dp"
@@ -21,8 +22,10 @@
             android:id="@+id/nav_settings"
             android:icon="@drawable/ic_settings_black_24dp"
             android:title="@string/navigation_drawer_settings"/>
+            -->
     </group>
 
+    <!--
     <item android:title="Communicate">
         <menu>
             <item
@@ -35,5 +38,5 @@
                 android:title="Send" />
         </menu>
     </item>
-
+    -->
 </menu>

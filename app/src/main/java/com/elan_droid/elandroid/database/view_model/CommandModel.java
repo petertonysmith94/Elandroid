@@ -6,7 +6,7 @@ import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 
 import com.elan_droid.elandroid.database.AppDatabase;
-import com.elan_droid.elandroid.database.relation.Command;
+import com.elan_droid.elandroid.database.data.relation.Command;
 
 /**
  * Created by Peter Smith on 4/24/2018.

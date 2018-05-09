@@ -5,25 +5,13 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.elan_droid.elandroid.database.AppDatabase;
-import com.elan_droid.elandroid.database.embedded.Response;
-import com.elan_droid.elandroid.database.entity.Flag;
-import com.elan_droid.elandroid.database.entity.Packet;
-import com.elan_droid.elandroid.database.entity.ParameterStream;
-import com.elan_droid.elandroid.database.entity.Trip;
-import com.elan_droid.elandroid.database.relation.Command;
+import com.elan_droid.elandroid.database.data.entity.Trip;
+import com.elan_droid.elandroid.database.data.relation.Command;
 import com.elan_droid.elandroid.database.view_model.TripModel;
-import com.elan_droid.elandroid.service.new_strategy.IOStrategy;
-import com.elan_droid.elandroid.service.new_strategy.ResponseStrategy;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.Arrays;
 
 /**
  * Created by Peter Smith on 4/22/2018.
  */
-
 public class LoggingManager extends BaseManager {
 
     public final static String TAG = "LoggingManager";

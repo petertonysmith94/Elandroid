@@ -4,20 +4,13 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 
 import com.elan_droid.elandroid.R;
-import com.elan_droid.elandroid.service.BaseService;
-import com.elan_droid.elandroid.ui.generic.BaseActivity;
-import com.elan_droid.elandroid.ui.generic.ServiceActivity;
-
-import static android.app.Activity.RESULT_OK;
 
 /**
  * Created by Peter Smith on 4/23/2018.
@@ -46,12 +39,12 @@ public class SaveTripDialog extends DialogFragment implements DialogInterface.On
          * Save the trip
          * @param tripName
          */
-        void onSaveTrip (String tripName);
+        void onSaveCurrentTrip(String tripName);
 
         /**
          * Delete the trip
          */
-        void onDelete ();
+        void onDeleteCurrentTrip();
         
     }
 
@@ -73,7 +66,7 @@ public class SaveTripDialog extends DialogFragment implements DialogInterface.On
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        View view = getActivity().getLayoutInflater().inflate(R.layout.dialog_dashboard_add_page, null);
+        View view = getActivity().getLayoutInflater().inflate(R.layout.dialog_dashboard_add_page, null, false);
         mNameText = view.findViewById(R.id.dialog_dashboard_add_page_name);
 
         return new AlertDialog.Builder(getActivity())
@@ -92,7 +85,7 @@ public class SaveTripDialog extends DialogFragment implements DialogInterface.On
         switch (which) {
             // SAVE
             case Dialog.BUTTON_POSITIVE:
-                mListener.onSaveTrip (mNameText.getText().toString());
+                mListener.onSaveCurrentTrip(mNameText.getText().toString());
                 break;
 
             // RESUME
@@ -102,7 +95,7 @@ public class SaveTripDialog extends DialogFragment implements DialogInterface.On
 
             // DELETE
             case Dialog.BUTTON_NEUTRAL:
-                mListener.onDelete();
+                mListener.onDeleteCurrentTrip();
                 break;
         }
     }

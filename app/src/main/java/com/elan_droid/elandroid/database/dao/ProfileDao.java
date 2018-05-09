@@ -2,14 +2,11 @@ package com.elan_droid.elandroid.database.dao;
 
 import android.arch.lifecycle.LiveData;
 import android.arch.persistence.room.Dao;
-import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Query;
-import android.arch.persistence.room.Transaction;
 
-import com.elan_droid.elandroid.database.entity.User;
-import com.elan_droid.elandroid.database.entity.Vehicle;
-import com.elan_droid.elandroid.database.relation.MinimalProfile;
-import com.elan_droid.elandroid.database.relation.Profile;
+import com.elan_droid.elandroid.database.data.entity.User;
+import com.elan_droid.elandroid.database.data.entity.Vehicle;
+import com.elan_droid.elandroid.database.data.relation.Profile;
 
 import java.util.List;
 

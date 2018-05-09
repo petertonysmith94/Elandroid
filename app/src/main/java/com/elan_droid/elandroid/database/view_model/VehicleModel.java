@@ -7,7 +7,7 @@ import android.os.AsyncTask;
 import android.widget.ArrayAdapter;
 
 import com.elan_droid.elandroid.database.AppDatabase;
-import com.elan_droid.elandroid.database.entity.Vehicle;
+import com.elan_droid.elandroid.database.data.entity.Vehicle;
 
 import java.util.List;
 

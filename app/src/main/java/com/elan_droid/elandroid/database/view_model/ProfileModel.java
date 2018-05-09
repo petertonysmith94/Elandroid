@@ -10,16 +10,17 @@ import android.os.AsyncTask;
 
 import com.elan_droid.elandroid.R;
 import com.elan_droid.elandroid.database.AppDatabase;
-import com.elan_droid.elandroid.database.entity.User;
-import com.elan_droid.elandroid.database.relation.Profile;
+import com.elan_droid.elandroid.database.data.entity.User;
+import com.elan_droid.elandroid.database.data.relation.Profile;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by Peter Smith
+ *
+ *
  */
-
 public class ProfileModel extends AndroidViewModel {
 
     private AppDatabase mDatabase;

@@ -6,7 +6,7 @@ import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 
 import com.elan_droid.elandroid.database.AppDatabase;
-import com.elan_droid.elandroid.database.entity.Parameter;
+import com.elan_droid.elandroid.database.data.entity.Parameter;
 
 import java.util.List;
 

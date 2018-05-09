@@ -34,6 +34,8 @@
 
     <string name="dashboard_title">Dashboard</string>
 
+    <!-- Trip Log activity -->
+    <string name="trip_log_title">Trip Log</string>
 
     <!-- Profile activity -->
     <string name="action_add_profile">Add profile</string>
@@ -41,6 +43,9 @@
     <string name="action_delete_profile">Delete</string>
     <string name="action_create_profile">Create profile</string>
 
+    <string name="profile_select_dialog_title">Select a profile</string>
+    <string name="profile_select_dialog_manage">Manage</string>
+    <string name="profile_select_dialog_cancel">Cancel</string>
 
     <string name="edit_profile_toast_updated_profile_success">Your profile has been updated</string>
     <string name="edit_profile_toast_updated_profile_fail">Your profile was unabled to be updated</string>

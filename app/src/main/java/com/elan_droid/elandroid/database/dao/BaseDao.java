@@ -5,17 +5,15 @@ import android.arch.persistence.room.Insert;
 
 /**
  * Created by Peter Smith
+ *
+ * Generic DAO for the insertion and deletion of database Entities
  */
-
 public interface BaseDao<T> {
 
     @Insert
-    public abstract long baseInsert(T element);
-
-    @Insert
-    public abstract void baseInsertAll (T... elements);
+    long baseInsert(T element);
 
     @Delete
-    public abstract void baseDelete(T... elements);
+    void baseDelete(T element);
 
 }

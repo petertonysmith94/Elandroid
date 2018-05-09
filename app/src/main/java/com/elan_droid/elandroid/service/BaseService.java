@@ -15,9 +15,8 @@ import android.widget.Toast;
 
 import com.elan_droid.elandroid.R;
 import com.elan_droid.elandroid.database.AppDatabase;
-import com.elan_droid.elandroid.database.entity.Trip;
-import com.elan_droid.elandroid.database.relation.Command;
-import com.elan_droid.elandroid.database.relation.Profile;
+import com.elan_droid.elandroid.database.data.entity.Trip;
+import com.elan_droid.elandroid.database.data.relation.Command;
 import com.elan_droid.elandroid.database.view_model.CommandModel;
 import com.elan_droid.elandroid.database.view_model.TripModel;
 import com.elan_droid.elandroid.service.new_strategy.IOStrategy;
@@ -29,7 +28,8 @@ import java.util.List;
 /**
  * Created by Peter Smith on 4/22/2018.
  *
- *
+ *  The BaseService allows for all IO based threads to run in the background. This means
+ *  that the process won't be stop when the app is not in the foreground.
  */
 public class BaseService extends Service {
 
@@ -49,55 +49,56 @@ public class BaseService extends Service {
         public static final int LOGGING_STATE_STOPPED = 1;
     public static final int MESSAGE_COMMAND_STOP_LOGGING = 9;
 
-
-
-    private final Messenger messenger = new Messenger(new IncomingHandler());
+    // Handles communication between the service and clients
+    private final Messenger messenger = new Messenger(new Handler(new IncomingHandler()));
     private final List<Messenger> clients = new ArrayList<>();
 
+    // Database and helpers
     private AppDatabase database;
     private LoggingManager loggingManager;
     private BluetoothManager bluetoothManager;
 
+    // Keeps reference to active objects
     private Trip activeTrip;
     private Command activeCommand;
 
-    private Profile activeProfile;
-    private boolean init = false;
-
-    private class IncomingHandler extends Handler {
+    /**
+     * The handler is used to deal with message, both sending and receiving
+     */
+    private class IncomingHandler implements Handler.Callback {
         @Override
-        public void handleMessage(Message msg) {
+        public boolean handleMessage(Message msg) {
             switch (msg.what) {
                 case MESSAGE_REGISTER_CLIENT:
                     //
                     if (!clients.contains(msg.replyTo)) {
                         clients.add(msg.replyTo);
                     }
-                    break;
+                    return true;
 
                 case MESSAGE_UNREGISTER_CLIENT:
                     clients.remove(msg.replyTo);
-                    break;
+                    return true;
 
                 case MESSAGE_COMMAND_BLUETOOTH_CONNECT:
                     connectBluetooth((BluetoothDevice) msg.obj);
-                    break;
+                    return true;
 
                 case MESSAGE_COMMAND_BLUETOOTH_DISCONNECT:
                     disconnectBluetooth();
-                    break;
+                    return true;
 
                 case MESSAGE_COMMAND_START_LOGGING:
                     startLoggingWithValidation( (Trip) msg.obj);
-                    break;
+                    return true;
 
                 case MESSAGE_COMMAND_STOP_LOGGING:
                     stopLogging ((String) msg.obj);
-                    break;
+                    return true;
 
                 default:
                     sendToClients(msg);
-                    break;
+                    return true;
             }
         }
     }
@@ -117,7 +118,7 @@ public class BaseService extends Service {
 
     /**
      * Sends a message to all registered clients of the service.
-     * Will baseDelete any clients which are unresponsive.
+     * Will remove any clients which are unresponsive.
      * @param msg   the message in which to send
      */
     private void sendToClients(Message msg) {
@@ -137,6 +138,11 @@ public class BaseService extends Service {
         }
     }
 
+    /**
+     * Send's a message back with some Toast in it, which will "popup" to user.
+     * @param resource   the message to be display
+     * @param length     the length of time for the toast to be displayed
+     */
     private void sendToast (@StringRes int resource, int length) {
         sendToast(getString(resource), length);
     }
@@ -144,6 +150,7 @@ public class BaseService extends Service {
     /**
      * Send's a message back with some Toast in it, which will "popup" to user.
      * @param message   the message to be displayed
+     * @param length    the length of time for the toast to be displayed
      */
     private void sendToast (String message, int length) {
         Message msg = new Message();
@@ -153,11 +160,8 @@ public class BaseService extends Service {
         sendToClients (msg);
     }
 
-
-    /**
-     * BLUETOOTH
-     * METHODS
-     * BELOW
+    /*
+     *  BLUETOOTH METHODS
      */
 
     /**
@@ -176,7 +180,7 @@ public class BaseService extends Service {
      * @param device    the target Bluetooth device
      */
     private void connectBluetooth (BluetoothDevice device) {
-        getBluetoothManager().connect(device, true);
+        getBluetoothManager().connect(device);
     }
 
     /**
@@ -191,10 +195,16 @@ public class BaseService extends Service {
     }
 
 
-    /**
+    /*
      * LOGGING SECTION
      */
 
+    /**
+     * Gets the instance of a logging manager, if null then creates a new instance
+     * TODO: implement the logging manager
+     * @return  a logging manager instance
+     */
+    @SuppressWarnings("unused")
     private LoggingManager getLoggingManager() {
         if (loggingManager == null) {
             loggingManager = new LoggingManager(messenger, database);
@@ -206,8 +216,9 @@ public class BaseService extends Service {
      * Checks that:
      *  a) You're connect to a device with an open stream.
      *  b) There is not an active logging process.
-     *  c)
-     * @param trip
+     *  c) Ensure the trip is database bound => otherwise inserts
+     *  d) Starts the command fetching logging method
+     * @param trip  a trip
      */
     private void startLoggingWithValidation (Trip trip) {
 
@@ -236,8 +247,8 @@ public class BaseService extends Service {
     }
 
     /**
-     *
-     * @param trip
+     * Fetches the command for the trip
+     * @param trip  a database trip
      */
     private void startLogging (final Trip trip) {
         if (trip.getMessageId() == 0) {
@@ -255,9 +266,9 @@ public class BaseService extends Service {
 
     /**
      * Command for starting logging with NO validation.
-     * DON'T use this method directly!
-     * @param trip
-     * @param command
+     * NOTE: DON'T use this method directly!
+     * @param trip      the database trip
+     * @param command   the command which will be used
      */
     private void startLogging (final Trip trip, final Command command) {
         this.activeTrip = trip;
@@ -270,8 +281,8 @@ public class BaseService extends Service {
     }
 
     /**
-     *
-     * @param state
+     * Sends a message to all clients with the current state of logging.
+     * @param state     the current state of logging
      */
     private void setLoggingState (int state) {
         Message msg = new Message();
@@ -281,16 +292,23 @@ public class BaseService extends Service {
         sendToClients(msg);
     }
 
+    /**
+     * Stops the logging process, then handles the trip
+     * @param tripName  null to delete, non-null to save trip
+     */
     private void stopLogging (String tripName) {
         if (bluetoothManager != null) {
             bluetoothManager.stopLogging();
         }
 
-        if (tripName == null)
-            delete (activeTrip);
-        else {
-            this.activeTrip.setName(tripName);
-            save(activeTrip);
+        // Checks that there is an active trip, if true, deals with it
+        if (activeTrip != null) {
+            if (tripName == null)
+                delete(activeTrip);
+            else {
+                this.activeTrip.setName(tripName);
+                save(activeTrip);
+            }
         }
         this.activeTrip = null;
         this.activeCommand = null;
@@ -298,8 +316,8 @@ public class BaseService extends Service {
     }
 
     /**
-     *
-     * @param trip
+     * Method for deleting a given trip asynchronously
+     * @param trip  a database referenced trip to delete
      */
     private void delete (final Trip trip) {
         Log.i(TAG, "Deleting trip " + trip.toString());
@@ -312,6 +330,10 @@ public class BaseService extends Service {
         }).execute(trip);
     }
 
+    /**
+     * Method for saving a given trip asynchronously
+     * @param trip  a database referenced trip to save
+     */
     private void save (final Trip trip) {
         Log.i(TAG, "Saving trip " + trip.toString());
         new TripModel.UpdateAsyncTask(database, new TripModel.UpdateTripCallback() {
@@ -322,8 +344,5 @@ public class BaseService extends Service {
             }
         }).execute(trip);
     }
-
-
-
 
 }

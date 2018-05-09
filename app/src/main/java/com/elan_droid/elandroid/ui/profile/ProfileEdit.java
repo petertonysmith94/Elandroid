@@ -20,7 +20,7 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.elan_droid.elandroid.R;
-import com.elan_droid.elandroid.database.relation.Profile;
+import com.elan_droid.elandroid.database.data.relation.Profile;
 import com.elan_droid.elandroid.database.view_model.ActiveProfile;
 
 import java.util.ArrayList;
@@ -205,11 +205,11 @@ public class ProfileEdit extends Fragment implements ActiveProfile.FetchActivePr
         View view = inflater.inflate(R.layout.fragment_profile_edit, container, false);
 
         /** Fetching the UI elements **/
-        mNameEditText = (EditText) view.findViewById(R.id.edit_profile_name_edit);
-        mMakeSpinner = (Spinner) view.findViewById(R.id.edit_profile_make_spinner);
-        mModelSpinner = (Spinner) view.findViewById(R.id.edit_profile_model_spinner);
-        mRegEditText = (EditText) view.findViewById(R.id.edit_profile_reg_edit);
-        mActiveCheck = (CheckBox) view.findViewById(R.id.edit_profile_active_check);
+        mNameEditText = view.findViewById(R.id.edit_profile_name_edit);
+        mMakeSpinner = view.findViewById(R.id.edit_profile_make_spinner);
+        mModelSpinner = view.findViewById(R.id.edit_profile_model_spinner);
+        mRegEditText = view.findViewById(R.id.edit_profile_reg_edit);
+        mActiveCheck = view.findViewById(R.id.edit_profile_active_check);
 
         updateUI(mCurrProfile);
 

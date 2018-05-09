@@ -13,9 +13,9 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.elan_droid.elandroid.database.AppDatabase;
-import com.elan_droid.elandroid.database.entity.Flag;
-import com.elan_droid.elandroid.database.entity.Packet;
-import com.elan_droid.elandroid.database.entity.Trip;
+import com.elan_droid.elandroid.database.data.entity.Flag;
+import com.elan_droid.elandroid.database.data.entity.Packet;
+import com.elan_droid.elandroid.database.data.entity.Trip;
 
 import java.util.List;
 

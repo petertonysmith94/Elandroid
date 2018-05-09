@@ -7,7 +7,7 @@ import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 
 import com.elan_droid.elandroid.database.AppDatabase;
-import com.elan_droid.elandroid.database.entity.PageItem;
+import com.elan_droid.elandroid.database.data.entity.PageItem;
 
 import java.util.List;
 
@@ -87,7 +87,7 @@ public class PageItemModel extends AndroidViewModel {
     }
 
     public interface UpdatePagesCallback {
-        public void onUpdate (boolean success);
+        void onUpdate(boolean success);
     }
 
     /**

@@ -47,7 +47,7 @@ public class DeviceListFragment extends Fragment {
     private RecyclerView.LayoutManager mLayoutManager;
 
     // Listeners
-    private DeviceAdapter.OnDeviceSelectedListener mDeviceListener;
+    private DeviceAdapter.DeviceSelectedListener mDeviceListener;
 
     public static DeviceListFragment getInstance() {
         return new DeviceListFragment();
@@ -58,10 +58,10 @@ public class DeviceListFragment extends Fragment {
         super.onAttach(context);
 
         try {
-            mDeviceListener = (DeviceAdapter.OnDeviceSelectedListener) getActivity();
+            mDeviceListener = (DeviceAdapter.DeviceSelectedListener) getActivity();
         }
         catch (ClassCastException e) {
-            throw new ClassCastException(context.toString() + " must implement DeviceAdapter.OnDeviceSelectedListener");
+            throw new ClassCastException(context.toString() + " must implement DeviceAdapter.DeviceSelectedListener");
         }
 
         // Registers the broadcast intent for finding devices

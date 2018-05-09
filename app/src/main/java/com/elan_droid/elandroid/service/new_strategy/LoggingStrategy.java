@@ -3,17 +3,15 @@ package com.elan_droid.elandroid.service.new_strategy;
 import android.database.sqlite.SQLiteConstraintException;
 import android.support.annotation.NonNull;
 import android.util.Log;
-import android.util.Xml;
 
 import com.elan_droid.elandroid.database.AppDatabase;
-import com.elan_droid.elandroid.database.embedded.Request;
-import com.elan_droid.elandroid.database.embedded.Response;
-import com.elan_droid.elandroid.database.entity.Packet;
+import com.elan_droid.elandroid.database.data.embedded.Request;
+import com.elan_droid.elandroid.database.data.embedded.Response;
+import com.elan_droid.elandroid.database.data.entity.Packet;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.math.BigInteger;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
@@ -56,7 +54,7 @@ public class LoggingStrategy implements ResponseStrategy {
     }
 
     @Override
-    public int execute(int requestCode, OutputStream out, InputStream in) throws IOException {
+    public int execute(int requestCode, OutputStream out, InputStream in) {
         return 0;
     }
 

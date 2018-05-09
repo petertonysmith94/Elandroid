@@ -1,17 +1,12 @@
 package com.elan_droid.elandroid.database.dao;
 
-import android.arch.core.util.Function;
 import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MediatorLiveData;
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.Transformations;
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Transaction;
-import android.support.annotation.Nullable;
 
-import com.elan_droid.elandroid.database.entity.Packet;
-import com.elan_droid.elandroid.database.entity.Trip;
+import com.elan_droid.elandroid.database.data.entity.Packet;
+import com.elan_droid.elandroid.database.data.entity.Trip;
 
 import java.util.List;
 

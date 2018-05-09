@@ -12,18 +12,19 @@ import android.support.annotation.Nullable;
 
 import com.elan_droid.elandroid.R;
 import com.elan_droid.elandroid.database.AppDatabase;
-import com.elan_droid.elandroid.database.entity.Page;
-import com.elan_droid.elandroid.database.entity.User;
-import com.elan_droid.elandroid.database.entity.Vehicle;
-import com.elan_droid.elandroid.database.relation.Profile;
+import com.elan_droid.elandroid.database.data.entity.Page;
+import com.elan_droid.elandroid.database.data.entity.User;
+import com.elan_droid.elandroid.database.data.entity.Vehicle;
+import com.elan_droid.elandroid.database.data.relation.Profile;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by Peter Smith
+ *
+ *
  */
-
 public class ActiveProfile extends AndroidViewModel {
 
     private AppDatabase mDatabase;
@@ -121,7 +122,7 @@ public class ActiveProfile extends AndroidViewModel {
         }).execute(getActiveProfileId());
     }
 
-    private long getActiveProfileId() {
+    public long getActiveProfileId() {
         return getApplication()
                 .getSharedPreferences(getApplication().getString(R.string.shared_prefs_profile), Context.MODE_PRIVATE)
                 .getLong(getApplication().getString(R.string.saved_active_profile_id), 0);

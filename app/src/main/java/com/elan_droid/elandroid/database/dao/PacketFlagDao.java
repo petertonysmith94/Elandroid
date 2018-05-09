@@ -1,12 +1,6 @@
 package com.elan_droid.elandroid.database.dao;
 
-import android.arch.core.util.Function;
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.Transformations;
 import android.arch.persistence.room.Dao;
-import android.arch.persistence.room.Transaction;
-
-import com.elan_droid.elandroid.database.entity.Packet;
 
 /**
  * Created by Peter Smith on 4/24/2018.

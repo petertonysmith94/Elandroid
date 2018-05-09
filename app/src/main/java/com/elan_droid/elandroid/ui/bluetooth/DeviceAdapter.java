@@ -11,24 +11,21 @@ import android.view.ViewGroup;
 import com.elan_droid.elandroid.R;
 import com.elan_droid.elandroid.databinding.ListItemBluetoothDeviceBinding;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Created by Peter Smith
  */
 
 public class DeviceAdapter extends RecyclerView.Adapter<DeviceItemHolder> {
 
-    public interface OnDeviceSelectedListener {
+    public interface DeviceSelectedListener {
         void onDeviceSelected(DeviceItem device);
     }
 
     private DeviceList mDevices;
-    private OnDeviceSelectedListener mListener;
+    private DeviceSelectedListener mListener;
 
 
-    public DeviceAdapter (@NonNull DeviceList devices, @Nullable OnDeviceSelectedListener listener) {
+    public DeviceAdapter (@NonNull DeviceList devices, @Nullable DeviceSelectedListener listener) {
         this.mDevices = devices;
         this.mListener = listener;
     }

@@ -8,42 +8,24 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 
-import com.elan_droid.elandroid.database.relation.Profile;
+import com.elan_droid.elandroid.database.data.relation.Profile;
 import com.elan_droid.elandroid.database.view_model.ActiveProfile;
-import com.elan_droid.elandroid.ui.callback.UpdateDialogListener;
 
 /**
  * Created by Peter Smith
+ *
+ *
  */
-
 public abstract class BaseFragment extends Fragment implements UpdateDialogListener {
 
     private static final String TAG = "BaseFragment";
-
-
-    public static final String EXTRA_PROFILE_ID = "com.elan_droid.elandroid.ui.generic.EXTRA_PROFILE_ID";
+    public static final String EXTRA_PROFILE_ID = "com.elan_droid.elandroid.generic.EXTRA_PROFILE_ID";
 
     private UpdateDialogListener mDialogCallback;
 
     private ActiveProfile mProfileModel;
 
-    public static Bundle createArguments(long userId) {
-        Bundle args  = new Bundle();
-        args.putLong(EXTRA_PROFILE_ID, userId);
-        return args;
-    }
 
-    public ActiveProfile getProfileModel() {
-        return mProfileModel;
-    }
-
-    public Profile getActiveProfile() {
-        return mProfileModel.getActiveProfile().getValue();
-    }
-
-    public long getActiveProfileId() {
-        return getActiveProfile() == null ? 0 : getActiveProfile().getProfileId();
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -68,6 +50,38 @@ public abstract class BaseFragment extends Fragment implements UpdateDialogListe
     @Override
     public void displayDialog (final DialogFragment fragment) {
         mDialogCallback.displayDialog(fragment);
+    }
+
+    /**
+     *
+     * TODO: can't we get the profile id the method?
+     * @param userId
+     * @return
+     */
+    public static Bundle createArguments(long userId) {
+        Bundle args  = new Bundle();
+        args.putLong(EXTRA_PROFILE_ID, userId);
+        return args;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public ActiveProfile getProfileModel() {
+        return mProfileModel;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public Profile getActiveProfile() {
+        return mProfileModel.getActiveProfile().getValue();
+    }
+
+    public long getActiveProfileId() {
+        return getActiveProfile() == null ? 0 : getActiveProfile().getProfileId();
     }
 
     public void setTitle(@StringRes int titleId) {

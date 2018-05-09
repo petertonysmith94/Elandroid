@@ -4,10 +4,10 @@ import android.arch.lifecycle.LiveData;
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Query;
 
-import com.elan_droid.elandroid.database.entity.Page;
-import com.elan_droid.elandroid.database.entity.PageItem;
-import com.elan_droid.elandroid.database.entity.User;
-import com.elan_droid.elandroid.database.relation.DetailedPage;
+import com.elan_droid.elandroid.database.data.entity.Page;
+import com.elan_droid.elandroid.database.data.entity.PageItem;
+import com.elan_droid.elandroid.database.data.entity.User;
+import com.elan_droid.elandroid.database.data.relation.DetailedPage;
 
 import java.util.List;
 

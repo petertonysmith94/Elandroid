@@ -6,9 +6,9 @@ import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 
 import com.elan_droid.elandroid.database.AppDatabase;
-import com.elan_droid.elandroid.database.entity.Page;
-import com.elan_droid.elandroid.database.entity.PageItem;
-import com.elan_droid.elandroid.database.relation.DetailedPage;
+import com.elan_droid.elandroid.database.data.entity.Page;
+import com.elan_droid.elandroid.database.data.entity.PageItem;
+import com.elan_droid.elandroid.database.data.relation.DetailedPage;
 
 import java.util.List;
 
@@ -63,7 +63,7 @@ public class PageModel extends PageItemModel {
     }
 
     public interface CreatePageCallback {
-        public void onCreate(DetailedPage page);
+        void onCreate(DetailedPage page);
     }
 
     /**
@@ -155,7 +155,7 @@ public class PageModel extends PageItemModel {
 
     public interface FetchDetailedPagesCallback {
 
-        public void onFetch (List<DetailedPage> pages);
+        void onFetch(List<DetailedPage> pages);
 
     }
 
@@ -196,7 +196,7 @@ public class PageModel extends PageItemModel {
 
     public interface FetchPagesCallback {
 
-        public void onFetch (List<Page> pages);
+        void onFetch(List<Page> pages);
 
     }
 
